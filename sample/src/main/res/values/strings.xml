@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">RxLocation Sample</string>
+    <string name="car_producer_image_content_description">bobo</string>
+    <string name="default_text_kws">koko</string>
+    <string name="separator">sep</string>
+    <string name="default_text_ps">miau</string>
+
+    <string name="kw">kW</string>
+    <string name="ps">PS</string>
+    <string name="brand">Brand</string>
+    <string name="model">Model</string>
+    <string name="power">Power</string>
+    <string name="price">Price</string>
+</resources>
