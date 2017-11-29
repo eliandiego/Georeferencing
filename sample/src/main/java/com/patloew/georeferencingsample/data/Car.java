@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample.data;
+package com.patloew.georeferencingsample.data;
 
 
 /**

@@ -1,10 +1,9 @@
-package com.patloew.rxlocationsample.geoData
+package com.patloew.georeferencingsample.geoData
 
 import android.location.Location
 import android.os.Environment
 import java.io.FileReader
 import java.io.PrintWriter
-import java.io.Reader
 
 
 /**
@@ -18,7 +17,7 @@ data class GeoData(val location: Location, val lat: Double, val lon: Double){
     constructor(location:Location) : this(location, 0.0, 0.0){
 
     val l = Location("");
-        
+
     }
 
     companion object Repozytorium{

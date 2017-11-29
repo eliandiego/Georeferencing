@@ -1,6 +1,6 @@
-package com.patloew.rxlocationsample.data;
+package com.patloew.georeferencingsample.data;
 
-import com.patloew.rxlocationsample.R;
+import com.patloew.georeferencingsample.R;
 
 import java.util.ArrayList;
 import java.util.List;

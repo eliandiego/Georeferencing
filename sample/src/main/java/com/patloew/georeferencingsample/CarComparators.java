@@ -1,6 +1,6 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
-import com.patloew.rxlocationsample.data.Car;
+import com.patloew.georeferencingsample.data.Car;
 
 import java.util.Comparator;
 

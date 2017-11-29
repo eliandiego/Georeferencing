@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -10,7 +10,7 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.SortStateViewProviders;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 //import de.codecrafters.tableviewexample.data.Car;
-import com.patloew.rxlocationsample.data.Car;
+import com.patloew.georeferencingsample.data.Car;
 
 /**
  * An extension of the {@link SortableTableView} that handles {@link Car}s.

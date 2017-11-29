@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import android.location.Address;
 import android.location.Location;
@@ -18,8 +18,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Arrays;
 
 import io.reactivex.Maybe;
 import io.reactivex.Observable;

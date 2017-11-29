@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.patloew.rxlocationsample.data.Car;
+import com.patloew.georeferencingsample.data.Car;
 
 import java.text.NumberFormat;
 import java.util.List;

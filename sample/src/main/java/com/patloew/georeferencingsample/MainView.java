@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import android.location.Address;
 import android.location.Location;

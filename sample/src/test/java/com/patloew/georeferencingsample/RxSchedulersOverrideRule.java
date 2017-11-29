@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;

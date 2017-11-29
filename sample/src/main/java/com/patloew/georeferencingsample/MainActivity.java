@@ -1,4 +1,4 @@
-package com.patloew.rxlocationsample;
+package com.patloew.georeferencingsample;
 
 import android.location.Address;
 import android.location.Location;
@@ -19,13 +19,13 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.patloew.rxlocation.RxLocation;
-import com.patloew.rxlocationsample.data.DataFactory;
+import com.patloew.georeferencingsample.data.DataFactory;
 
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
-import com.patloew.rxlocationsample.data.Car;
-import com.patloew.rxlocationsample.geoData.GeoData;
+import com.patloew.georeferencingsample.data.Car;
+import com.patloew.georeferencingsample.geoData.GeoData;
 
 
 import java.text.DateFormat;
