@@ -18,6 +18,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.patloew.georeferencingsample.UtilMS.UtilsMS;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.georeferencingsample.data.DataFactory;
 
@@ -25,7 +26,7 @@ import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import com.patloew.georeferencingsample.data.Car;
-import com.patloew.georeferencingsample.geoData.GeoData;
+import com.patloew.georeferencingsample.geoData.GeoLocation;
 
 
 import java.text.DateFormat;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private MainPresenter presenter;
     private Button button2;
     private EditText mackotext;
+    private GeoLocationDataAdapter geoAdapter= null;
+
+
 
     private Car getRandomCar() {
         final List<Car> carList = DataFactory.createCarList();
@@ -103,6 +107,23 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         button2 = findViewById(R.id.button2);
         mackotext = findViewById(R.id.editText);
+        Location l = new Location("dd");
+        l.setLatitude(2.2);
+        l.setLongitude(2.1);
+        GeoLocation g1 = new GeoLocation(l, 3.3, 5.5, true, 0);
+        GeoLocation g2 = new GeoLocation(l, 2.4, 4.4, true, 0);
+
+        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
+        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
+
+        final SortableGeoLocationTableView geoTableView = findViewById(R.id.tableViewGeo);
+        if(geoTableView != null){
+            geoAdapter = new GeoLocationDataAdapter(this,
+                    com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositions(),
+                    geoTableView);
+            geoTableView.setDataAdapter(geoAdapter);
+
+        }
 
         final SortableCarTableView carTableView = (SortableCarTableView) findViewById(R.id.tableView);
         if (carTableView != null) {
@@ -133,9 +154,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
             @Override
             public void onClick (View v){
                 Log.d("SSR", "blebe");
+                Location l = new Location("");
+                l.setLongitude(UtilsMS.Companion.randomDoublePos());
+                l.setLatitude(UtilsMS.Companion.randomDoublePos());
+                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, UtilsMS.Companion.randomDoublePos(), UtilsMS.Companion.randomDoublePos());
+                // geoTableView. - redraw?
+                geoAdapter.notifyDataSetChanged();
+                    //geoTableView.refreshDrawableState();
 
-                GeoData.Repozytorium.writePositionsToFile();
-                String s = GeoData.Repozytorium.readFromFile();
+                GeoLocation.Repozytorium.writePositionsToFile();
+                String s = GeoLocation.Repozytorium.readFromFile();
                 mackotext.setText("dd" + s);
 
             }

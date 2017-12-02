@@ -25,6 +25,16 @@
                 custom:tableView_headerColor="@color/primary"
                 custom:tableView_headerElevation="10" />
 
+            <com.patloew.georeferencingsample.SortableGeoLocationTableView
+                android:id="@+id/tableViewGeo"
+                android:layout_width="match_parent"
+                android:layout_height="138dp"
+                android:layout_below="@id/toolbar"
+                custom:tableView_columnCount="4"
+                custom:tableView_headerColor="@color/primary"
+                custom:tableView_headerElevation="10" />
+
+
             <TextView
                 android:id="@+id/textView9"
                 style="@style/TextAppearance.AppCompat.Caption"
