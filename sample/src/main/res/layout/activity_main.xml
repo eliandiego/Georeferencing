@@ -209,9 +209,15 @@
             <TextView
                 android:id="@+id/textView14"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="159dp"
                 android:layout_weight="1"
                 android:text="TextView" />
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="367dp" />
+
         </LinearLayout>
     </ScrollView>
 

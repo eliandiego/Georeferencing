@@ -13,4 +13,8 @@
     <string name="price">Price</string>
     <string name="position">Pos.</string>
     <string name="offsets">Offs.</string>
+    <string name="google_maps_api_key">AIzaSyBU02BhkVI_WduFGCDTNB00ox56mbreqzU</string>
+
+
 </resources>
+

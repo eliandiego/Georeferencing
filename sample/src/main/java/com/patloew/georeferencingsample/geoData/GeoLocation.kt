@@ -1,5 +1,7 @@
 package com.patloew.georeferencingsample.geoData
 
+//import com.google.android.gms.
+
 import android.location.Location
 import android.os.Environment
 import java.io.FileReader
@@ -22,7 +24,7 @@ data class GeoLocation (val location: Location,
     //Repozytorium
     //val num = Repozytorium.
 
-    constructor(location:Location) : this(location, 0.0, 0.0, true, 0){
+    constructor(location: Location) : this(location, 0.0, 0.0, true, 0){
         //Repozytorium.positions
         val l = Location("");
 
@@ -30,6 +32,8 @@ data class GeoLocation (val location: Location,
 
     companion object Repozytorium{
         public var positions: MutableList<GeoLocation> = mutableListOf();
+
+        public var positionsUser: MutableList<GeoLocation> = mutableListOf();
 
         public var locationPositions: MutableMap<Int, GeoLocation> = mutableMapOf();
         public var searchPositions: MutableMap<Int, GeoLocation> = mutableMapOf();
@@ -39,6 +43,7 @@ data class GeoLocation (val location: Location,
             val numer = locationPositions.size;
             val nowaZNum = nowa.copy(num = numer);
             locationPositions[numer]  = nowaZNum;
+            positionsUser.add(nowaZNum);
         }
 
         fun addStartPoint(loc: Location){
@@ -52,6 +57,11 @@ data class GeoLocation (val location: Location,
             val numer = searchPositions.size;
             val nowaZNum = nowa.copy(num = numer);
             searchPositions[numer]  = nowaZNum;
+            positionsUser.add(nowaZNum);
+        }
+
+        fun giveAllStoredLocationPositions() : List<GeoLocation> {
+            return locationPositions.values.toList()
         }
 
         fun giveAllStoredPositions() : List<GeoLocation> {

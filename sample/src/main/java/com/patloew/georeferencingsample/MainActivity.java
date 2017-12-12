@@ -16,6 +16,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.patloew.georeferencingsample.UtilMS.UtilsMS;
@@ -30,6 +39,7 @@ import com.patloew.georeferencingsample.geoData.GeoLocation;
 
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -55,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private TextView lastUpdate;
     private TextView locationText;
     private TextView addressText;
+
+     private MapFragment mapFragment =  null;
+     private MapView mapView = null;
 
     private RxLocation rxLocation;
 
@@ -90,11 +103,84 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
     }
 
+    private List<GeoLocation> toLista(){
+        List<GeoLocation> res = new ArrayList<>();
+
+        for (GeoLocation e : GeoLocation.Repozytorium.getLocationPositions().values()) {
+            res.add(e);
+        }
+        return res;
+
+    }
+
+    /*
+    protected void setUpMapIfNeeded() {
+
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mapFragment == null) {
+            mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView));
+            // Check if we were successful in obtaining the map.
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap map) {
+                        loadMap(map);
+                    }
+                });
+            }
+        }
+    }
+    */
+
+    private void configureCameraIdle(){
+        //GoogleMap.OnCameraIdleListener
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        mapView = findViewById(R.id.mapView);
+        if( mapView != null) {
+            mapView.onCreate(null);
+
+
+
+            mapView.getMapAsync(new OnMapReadyCallback() {
+
+
+
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    //map = googleMap;
+
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    //                googleMap.getUiSettings().setZoomGesturesEnabled(true);
+                    googleMap.getUiSettings().setCompassEnabled(true);
+                    googleMap.getUiSettings().setScrollGesturesEnabled(true);
+//                    googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+                    googleMap.getUiSettings().setZoomGesturesEnabled(true);
+                    googleMap.getUiSettings().setZoomControlsEnabled(true);
+                    googleMap.getUiSettings().setMapToolbarEnabled(true);
+                    //googleMap.setMinZoomPreference(6.0f);
+                    //googleMap.setMaxZoomPreference(14.0f);
+
+                    LatLng l = new LatLng(-21.1, 52.2);
+                    //googleMap.moveCamera(CameraUpdateFactory.newLatLng(52.1, -21.9));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(l));
+
+
+                    //Do what you want with the map!!
+                }
+            });
+
+            MapsInitializer.initialize(this);
+
+        }
+
+        //mapView.
 
         lastUpdate = findViewById(R.id.tv_last_update);
         locationText = findViewById(R.id.tv_current_location);
@@ -116,10 +202,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
         com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
         com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
 
+
         final SortableGeoLocationTableView geoTableView = findViewById(R.id.tableViewGeo);
         if(geoTableView != null){
             geoAdapter = new GeoLocationDataAdapter(this,
-                    com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositions(),
+            //        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositions(), // ok ale sa niepotrzebne tez
+                    //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredPositions(), // nie uaktualnia sie
+                    //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), // nie uaktualnia sie
+                    //toLista(),
+                    com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser(),
                     geoTableView);
             geoTableView.setDataAdapter(geoAdapter);
 
@@ -158,8 +249,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 l.setLongitude(UtilsMS.Companion.randomDoublePos());
                 l.setLatitude(UtilsMS.Companion.randomDoublePos());
                 com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, UtilsMS.Companion.randomDoublePos(), UtilsMS.Companion.randomDoublePos());
+
                 // geoTableView. - redraw?
+                geoAdapter.notifyDataSetInvalidated();
                 geoAdapter.notifyDataSetChanged();
+
+
                     //geoTableView.refreshDrawableState();
 
                 GeoLocation.Repozytorium.writePositionsToFile();
@@ -182,7 +277,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     protected void onResume() {
+        mapView.onResume();
         super.onResume();
+
         checkPlayServicesAvailable();
     }
 
