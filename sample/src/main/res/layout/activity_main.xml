@@ -16,14 +16,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.patloew.georeferencingsample.SortableCarTableView
-                android:id="@+id/tableView"
-                android:layout_width="match_parent"
-                android:layout_height="138dp"
-                android:layout_below="@id/toolbar"
-                custom:tableView_columnCount="4"
-                custom:tableView_headerColor="@color/primary"
-                custom:tableView_headerElevation="10" />
+
 
             <com.patloew.georeferencingsample.SortableGeoLocationTableView
                 android:id="@+id/tableViewGeo"
@@ -104,27 +97,51 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <RadioGroup
+                    android:id="@+id/RadioGrupaOsnowaLampion"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radioButton_osnowa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Osnowa (posXY+valid gps/marker)" />
+
+                    <RadioButton
+                        android:id="@+id/radioButton_lampion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Lampion" />
+                </RadioGroup>
 
                 <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
                     <RadioButton
-                        android:id="@+id/radioButton3"
+                        android:id="@+id/radioButtonPositionSource_GPS"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Osnowa" />
+                        android:text="GPS" />
 
                     <RadioButton
+                        android:id="@+id/radioButtonPositionSource_measure"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Dystans" />
                 </RadioGroup>
-
             </LinearLayout>
 
             <LinearLayout
@@ -139,12 +156,13 @@
                     android:text="x [cm]=" />
 
                 <EditText
+                    android:id="@+id/offsetX"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="Name" />
+                    android:text="0.0" />
 
                 <TextView
                     android:layout_width="21dp"
@@ -153,12 +171,14 @@
                     android:text="y [cm]=" />
 
                 <EditText
+                    android:id="@+id/offsetY"
                     android:layout_width="89dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="Name" />
+                    android:numeric="signed|decimal"
+                    android:text="0.0" />
 
             </LinearLayout>
 
@@ -206,6 +226,12 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/buttonCenterMap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Center Map on GPS" />
+
             <TextView
                 android:id="@+id/textView14"
                 android:layout_width="match_parent"
@@ -213,11 +239,20 @@
                 android:layout_weight="1"
                 android:text="TextView" />
 
-            <com.google.android.gms.maps.MapView
+<!--            <com.google.android.gms.maps.MapView -->
+            <com.patloew.georeferencingsample.CustomMapView
                 android:id="@+id/mapView"
                 android:layout_width="match_parent"
                 android:layout_height="367dp" />
 
+            <com.patloew.georeferencingsample.SortableCarTableView
+                android:id="@+id/tableView"
+                android:layout_width="match_parent"
+                android:layout_height="138dp"
+                android:layout_below="@id/toolbar"
+                custom:tableView_columnCount="4"
+                custom:tableView_headerColor="@color/primary"
+                custom:tableView_headerElevation="10" />
         </LinearLayout>
     </ScrollView>
 

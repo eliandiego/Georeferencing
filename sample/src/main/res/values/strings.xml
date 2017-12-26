@@ -7,6 +7,10 @@
 
     <string name="kw">kW</string>
     <string name="ps">PS</string>
+    <string name="cmX">cmX</string>
+    <string name="cmY">cmY</string>
+    <string name="latitude">lat</string>
+    <string name="longitude">long</string>
     <string name="brand">Brand</string>
     <string name="model">Model</string>
     <string name="power">Power</string>

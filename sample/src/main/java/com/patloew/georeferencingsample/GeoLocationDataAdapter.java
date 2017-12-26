@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.patloew.georeferencingsample.data.Car;
 import com.patloew.georeferencingsample.geoData.GeoLocation;
+import com.patloew.georeferencingsample.geoData.PointType;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -52,7 +53,7 @@ public class GeoLocationDataAdapter extends LongPressAwareTableDataAdapter<GeoLo
                 renderedView = renderOffsets(geoLocation, parentView);
                 break;
             case 3:
-                renderedView = renderNic();
+                renderedView = renderTyp(geoLocation);
                 break;
         }
 
@@ -120,8 +121,13 @@ public class GeoLocationDataAdapter extends LongPressAwareTableDataAdapter<GeoLo
         final TextView kwView = (TextView) view.findViewById(R.id.lat_view);
         final TextView psView = (TextView) view.findViewById(R.id.lon_view);
 
-        kwView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getOffsetX(), getContext().getString(R.string.kw)));
-        psView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getOffsetY(), getContext().getString(R.string.ps)));
+        if(geoLocation.isOffsetPoint()) {
+            kwView.setText(geoLocation.getRefLocationNum() + " : " + format(Locale.ENGLISH, "%f %s", geoLocation.getOffsetX(), getContext().getString(R.string.cmX)));
+            psView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getOffsetY(), getContext().getString(R.string.cmY)));
+        } else {
+            kwView.setText("---");
+            psView.setText("---");
+        }
 
         return view;
     }
@@ -131,14 +137,23 @@ public class GeoLocationDataAdapter extends LongPressAwareTableDataAdapter<GeoLo
         final TextView kwView = (TextView) view.findViewById(R.id.lat_view);
         final TextView psView = (TextView) view.findViewById(R.id.lon_view);
 
-        kwView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getLocation().getLatitude(), getContext().getString(R.string.kw)));
-        psView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getLocation().getLongitude(), getContext().getString(R.string.ps)));
+        if(geoLocation.getLocation() != null) {
+            kwView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getLocation().getLatitude(), getContext().getString(R.string.latitude)));
+            psView.setText(format(Locale.ENGLISH, "%f %s", geoLocation.getLocation().getLongitude(), getContext().getString(R.string.longitude)));
+        }
 
         return view;
     }
 
 
     private View renderNic(){return renderString("bobo");}
+
+    private View renderTyp(final GeoLocation geo){
+        String wynik = "OSN";
+        if(geo.getType() == PointType.LAMPION)
+            wynik = "LAM";
+        return renderString(wynik);}
+
     private View renderPosNumber(final GeoLocation geoLocation) { return renderString(String.valueOf(geoLocation.getNum()));}
 
 

@@ -12,9 +12,19 @@ import java.io.PrintWriter
  * Created by maciek on 11/29/17.
  */
 
+enum class PointType
+{ LAMPION, OSNOWA }
 
-data class GeoLocation (val location: Location,
-                        val offsetX: Double, val offsetY: Double, val locationPos: Boolean, val num:Int){
+data class GeoLocation (val location: Location?,
+                        val offsetX: Double, val offsetY: Double, val locationPos: Boolean, val num:Int, val refLocationNum:Int = 0,
+                        val typ:PointType = PointType.LAMPION){
+
+    constructor(offsetX: Double, offsetY: Double, refLocation:Int) : this(null, offsetX, offsetY, true, 0, refLocation){
+
+    }
+
+    //private var typ: PointType = PointType.LAMPION;
+
 
 
 
@@ -23,6 +33,27 @@ data class GeoLocation (val location: Location,
     }
     //Repozytorium
     //val num = Repozytorium.
+
+    /*
+    fun isOffsetPoint(): Boolean {
+        if(location == null)
+            return true;
+        return false;
+    }*/
+
+    fun isOffsetPoint(): Boolean {
+        if(offsetX == 0.0 && offsetY == 0.0)
+            return false;
+        return true;
+    }
+
+    //fun setTypeOsnowa(){
+//        typ = PointType.OSNOWA;
+//    }
+
+    fun getType() : PointType{
+        return typ;
+    }
 
     constructor(location: Location) : this(location, 0.0, 0.0, true, 0){
         //Repozytorium.positions
@@ -38,12 +69,48 @@ data class GeoLocation (val location: Location,
         public var locationPositions: MutableMap<Int, GeoLocation> = mutableMapOf();
         public var searchPositions: MutableMap<Int, GeoLocation> = mutableMapOf();
 
-        fun addNewLocationPoint(loc: Location, offsetX: Double, offsetY: Double){
+        fun addNewLocationPoint(loc: Location, offsetX: Double, offsetY: Double) : GeoLocation{
             val nowa = GeoLocation(loc, offsetX, offsetY, true, 0);
+            return addNewPointToRepo(nowa)
+        }
+
+        fun addNewPointToRepo(g: GeoLocation) : GeoLocation{
+
             val numer = locationPositions.size;
-            val nowaZNum = nowa.copy(num = numer);
+            val nowaZNum = g.copy(num = numer);
             locationPositions[numer]  = nowaZNum;
             positionsUser.add(nowaZNum);
+            return nowaZNum
+
+        }
+
+        fun addNewLampionPoint(loc: Location, name: String = "default"){
+             val g = addNewLocationPoint(loc, 0.0, 0.0)
+        }
+
+        fun addNewLampionPoint(relativeToNr: Int, offsetX: Double, offsetY : Double){
+
+        }
+
+
+        fun addNewOsnowaPoint(loc: Location){
+            val g = addNewLocationPoint(loc, 0.0, 0.0)
+            //g.setTypeOsnowa();
+        }
+
+        fun addNewOsnowaPointWithValidPos(loc: Location, relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
+            val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA);
+            return addNewPointToRepo(nowa)
+        }
+
+        fun addNewOsnowaPoint(relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
+
+            val nowa = GeoLocation(null, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA);
+            //nowa.setTypeOsnowa()
+            return addNewPointToRepo(nowa)
+
+            //val g = addNewLocationPoint(null, offsetX, offsetY, )
+            //g.setTypeOsnowa();
         }
 
         fun addStartPoint(loc: Location){
