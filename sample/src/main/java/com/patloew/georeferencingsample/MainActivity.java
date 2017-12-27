@@ -1,5 +1,7 @@
 package com.patloew.georeferencingsample;
 
+
+
 import android.content.Context;
 import android.location.Address;
 import android.location.Location;
@@ -37,6 +39,9 @@ import com.patloew.georeferencingsample.UtilMS.UtilsMS;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.georeferencingsample.data.DataFactory;
 
+import com.patloew.georeferencingsample.geoData.CalculateDistancesKt;
+
+
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
@@ -47,6 +52,7 @@ import com.patloew.georeferencingsample.geoData.GeoLocation;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private TextView locationText;
     private TextView addressText;
     private Marker currentMarker = null;
+    private List<Marker> markers = new LinkedList<>();
 
      private MapFragment mapFragment =  null;
      private MapView mapView = null;
@@ -93,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     private MainPresenter presenter;
     private Button button2;
+    private Button buttonDrawMarkers;
+    private Button buttonComputeDistances;
     private EditText mackotext;
     private GeoLocationDataAdapter geoAdapter= null;
 
@@ -278,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         centerMap = findViewById(R.id.buttonCenterMap);
 
+
         lastUpdate = findViewById(R.id.tv_last_update);
         locationText = findViewById(R.id.tv_current_location);
         addressText = findViewById(R.id.tv_current_address);
@@ -287,7 +297,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         presenter = new MainPresenter(rxLocation);
 
+
         button2 = findViewById(R.id.button2);
+        buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
+        buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
         mackotext = findViewById(R.id.editText);
 
         radioButtonPositionSource_gps = findViewById(R.id.radioButtonPositionSource_GPS);
@@ -301,14 +314,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         radioGroupOsnowaLampion = findViewById(R.id.RadioGrupaOsnowaLampion);
 
-        Location l = new Location("dd");
-        l.setLatitude(2.2);
-        l.setLongitude(2.1);
+        //Location l = new Location("dd");
+        //l.setLatitude(2.2);
+        //l.setLongitude(2.1);
         //GeoLocation g1 = new GeoLocation(l, 3.3, 5.5, true, 0);
         //GeoLocation g2 = new GeoLocation(l, 2.4, 4.4, true, 0);
 
-        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
-        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
+        //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
+        //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
 
 
         final SortableGeoLocationTableView geoTableView = findViewById(R.id.tableViewGeo);
@@ -382,6 +395,24 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
         });
 
+        buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+
+                                           DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+
+                                       }
+
+                                   });
+
+        buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
+                                                      @Override
+                                                      public void onClick(View v) {
+                                                          String res = CalculateDistancesKt.computeDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+                                                          Log.d("SSR", "odleglosci" + res);
+                                                      }
+                                                  });
+
         button2.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -395,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 if(radioButtonPositionType_osnowa.isChecked()){
                     Double offX = Double.parseDouble(offsetX.getText().toString());
                     Double offY = Double.parseDouble(offsetY.getText().toString());
-                    if(offX == 0.0 && offY == 0.0){
+                    if((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()){
                         Toast.makeText(getBaseContext(), "both offs can be 0.0 for osnowa!", Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -413,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                         l.setLongitude(msLastLocation.getLongitude());
 
                         //l.setLa
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPos(l, 0, offX, offY);
+                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromGPS(l, 0, offX, offY);
 
 
 
@@ -428,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
                         // marker
                         l.setLatitude(currentMarker.getPosition().latitude);
                         l.setLongitude(currentMarker.getPosition().longitude);
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPos(l, 0, offX, offY);
+                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(l, 0, offX, offY);
 
                         //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPoint(0, );
                     }
@@ -573,6 +604,44 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
 
         return addressText;
+    }
+
+    private void DrawMarkers(List<GeoLocation> locations){
+
+        for(GeoLocation g : locations){
+
+            Location l = g.getLocation();
+            if(l != null){
+
+                LatLng ll = new LatLng(l.getLatitude(), l.getLongitude());
+
+                String desc = "";
+                float kolor = BitmapDescriptorFactory.HUE_CYAN;
+
+                switch(g.getType()){
+                    case OSNOWA_MARKER: desc = "OS_mark_"; kolor = BitmapDescriptorFactory.HUE_BLUE; break;
+                    case OSNOWA_GPS: desc = "OS_gps_";kolor = BitmapDescriptorFactory.HUE_AZURE; break;
+                    case LAMPION_MARKER: desc = "LA_mark_"; kolor = BitmapDescriptorFactory.HUE_ORANGE; break;
+                    case LAMPION_OFF: desc = "LA_off_";kolor = BitmapDescriptorFactory.HUE_RED; break;
+                }
+
+
+
+
+
+
+
+                desc += g.getNum();
+
+                currentMarker = mapaGooglowa.addMarker(new MarkerOptions()
+                        .position(ll).title(desc)
+                        .icon(BitmapDescriptorFactory.defaultMarker(kolor))
+                        .draggable(false).visible(true));
+            }
+
+        }
+
+
     }
 
 }

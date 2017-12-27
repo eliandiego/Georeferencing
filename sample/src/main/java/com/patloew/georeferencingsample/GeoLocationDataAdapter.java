@@ -149,9 +149,14 @@ public class GeoLocationDataAdapter extends LongPressAwareTableDataAdapter<GeoLo
     private View renderNic(){return renderString("bobo");}
 
     private View renderTyp(final GeoLocation geo){
-        String wynik = "OSN";
-        if(geo.getType() == PointType.LAMPION)
-            wynik = "LAM";
+
+        String wynik = "";
+        switch(geo.getType()){
+            case OSNOWA_GPS: wynik = "O_GPS"; break;
+            case OSNOWA_MARKER: wynik = "O_MK"; break;
+            case LAMPION_MARKER: wynik = "L_MK"; break;
+            case LAMPION_OFF: wynik = "L_OFF"; break;
+        }
         return renderString(wynik);}
 
     private View renderPosNumber(final GeoLocation geoLocation) { return renderString(String.valueOf(geoLocation.getNum()));}

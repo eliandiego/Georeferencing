@@ -13,11 +13,11 @@ import java.io.PrintWriter
  */
 
 enum class PointType
-{ LAMPION, OSNOWA }
+{ LAMPION_MARKER, LAMPION_OFF, OSNOWA_MARKER, OSNOWA_GPS }
 
 data class GeoLocation (val location: Location?,
                         val offsetX: Double, val offsetY: Double, val locationPos: Boolean, val num:Int, val refLocationNum:Int = 0,
-                        val typ:PointType = PointType.LAMPION){
+                        val typ:PointType = PointType.LAMPION_OFF){
 
     constructor(offsetX: Double, offsetY: Double, refLocation:Int) : this(null, offsetX, offsetY, true, 0, refLocation){
 
@@ -98,20 +98,20 @@ data class GeoLocation (val location: Location?,
             //g.setTypeOsnowa();
         }
 
-        fun addNewOsnowaPointWithValidPos(loc: Location, relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
-            val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA);
+        fun addNewOsnowaPointWithValidPosFromGPS(loc: Location, relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
+            val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA_GPS);
             return addNewPointToRepo(nowa)
         }
 
-        fun addNewOsnowaPoint(relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
-
-            val nowa = GeoLocation(null, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA);
-            //nowa.setTypeOsnowa()
+        fun addNewOsnowaPointWithValidPosFromMarker(loc: Location, relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
+            val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA_MARKER);
             return addNewPointToRepo(nowa)
-
-            //val g = addNewLocationPoint(null, offsetX, offsetY, )
-            //g.setTypeOsnowa();
         }
+
+        fun isRepositoryEmpty() : Boolean {
+            return giveAllStoredLocationPositions().isEmpty()
+        }
+
 
         fun addStartPoint(loc: Location){
             val nowa = GeoLocation(loc, 0.0, 0.0, true, 0);

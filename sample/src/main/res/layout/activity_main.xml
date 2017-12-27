@@ -232,8 +232,20 @@
                 android:layout_height="wrap_content"
                 android:text="Center Map on GPS" />
 
+            <Button
+                android:id="@+id/buttonCalculateDistances"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Calculate Distances" />
+
+            <Button
+                android:id="@+id/buttonShowPointsOnMap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Points on Map" />
+
             <TextView
-                android:id="@+id/textView14"
+                android:id="@+id/textViewInformacje"
                 android:layout_width="match_parent"
                 android:layout_height="159dp"
                 android:layout_weight="1"
