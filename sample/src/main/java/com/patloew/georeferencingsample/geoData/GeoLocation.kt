@@ -4,9 +4,12 @@ package com.patloew.georeferencingsample.geoData
 
 import android.location.Location
 import android.os.Environment
+import com.google.gson.Gson
 import java.io.FileReader
 import java.io.PrintWriter
 
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 
 /**
  * Created by maciek on 11/29/17.
@@ -15,7 +18,7 @@ import java.io.PrintWriter
 enum class PointType
 { LAMPION_MARKER, LAMPION_OFF, OSNOWA_MARKER, OSNOWA_GPS }
 
-data class GeoLocation (val location: Location?,
+data class GeoLocation (var location: Location?,
                         val offsetX: Double, val offsetY: Double, val locationPos: Boolean, val num:Int, val refLocationNum:Int = 0,
                         val typ:PointType = PointType.LAMPION_OFF){
 
@@ -29,7 +32,7 @@ data class GeoLocation (val location: Location?,
 
 
     init {
-        positions.add(this);
+        //positions.add(this);
     }
     //Repozytorium
     //val num = Repozytorium.
@@ -55,14 +58,10 @@ data class GeoLocation (val location: Location?,
         return typ;
     }
 
-    constructor(location: Location) : this(location, 0.0, 0.0, true, 0){
-        //Repozytorium.positions
-        val l = Location("");
 
-    }
 
     companion object Repozytorium{
-        public var positions: MutableList<GeoLocation> = mutableListOf();
+        //public var positions: MutableList<GeoLocation> = mutableListOf();
 
         public var positionsUser: MutableList<GeoLocation> = mutableListOf();
 
@@ -88,15 +87,13 @@ data class GeoLocation (val location: Location?,
              val g = addNewLocationPoint(loc, 0.0, 0.0)
         }
 
-        fun addNewLampionPoint(relativeToNr: Int, offsetX: Double, offsetY : Double){
-
+        fun addNewLampionPoint(relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
+            val nowa = GeoLocation(null, offsetX, offsetY, true, 0, relativeToNr, PointType.LAMPION_OFF);
+            return addNewPointToRepo(nowa)
         }
 
 
-        fun addNewOsnowaPoint(loc: Location){
-            val g = addNewLocationPoint(loc, 0.0, 0.0)
-            //g.setTypeOsnowa();
-        }
+
 
         fun addNewOsnowaPointWithValidPosFromGPS(loc: Location, relativeToNr: Int, offsetX: Double, offsetY : Double) : GeoLocation{
             val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA_GPS);
@@ -107,6 +104,26 @@ data class GeoLocation (val location: Location?,
             val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA_MARKER);
             return addNewPointToRepo(nowa)
         }
+
+
+
+        fun getMutableMapFromJsonLocationPositions(g: Gson, text: String) : MutableMap<Int, GeoLocation> {
+
+
+            locationPositions =  g.fromJson(text, object:TypeToken< MutableMap<Int, GeoLocation> >() {}.type);
+            return locationPositions
+
+        }
+
+        fun getMutableMapFromJsonPositionsUser(g: Gson, text: String) : MutableList<GeoLocation> {
+
+
+            positionsUser =  g.fromJson(text, object:TypeToken< MutableList<GeoLocation> >() {}.type);
+            return positionsUser
+
+        }
+
+
 
         fun isRepositoryEmpty() : Boolean {
             return giveAllStoredLocationPositions().isEmpty()

@@ -2,11 +2,15 @@ package com.patloew.georeferencingsample;
 
 import android.location.Address;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
 import com.patloew.rxlocation.RxLocation;
 
+import java.util.Locale;
+
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -53,6 +57,7 @@ public class MainPresenter {
     }
 
     public void startLocationRefresh() {
+
         disposable.add(
                 rxLocation.settings().checkAndHandleResolution(locationRequest)
                         .flatMapObservable(this::getAddressObservable)
@@ -78,10 +83,26 @@ public class MainPresenter {
         }
     }
 
-    private Observable<Address> getAddressFromLocation(Location location) {
-        return rxLocation.geocoding().fromLocation(location).toObservable()
-                .subscribeOn(Schedulers.io());
+    public Maybe<Address> fromLocationMS(Location location) {
+        Locale l = new Locale("pl");
+        Address a = new Address(l);
+        a.setLatitude(2.2);
+        a.setLongitude(2.3);
+        Maybe<Address> m = Maybe.create(emitter -> {
+            emitter.onSuccess(a);
+
+        });
+
+        return m;
     }
+
+    private Observable<Address> getAddressFromLocation(Location location) {
+        return fromLocationMS(location).toObservable()
+                .subscribeOn(Schedulers.io());
+
+        //return null;
+    }
+
 
 
 }
