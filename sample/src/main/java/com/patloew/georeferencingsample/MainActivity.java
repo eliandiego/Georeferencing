@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -47,7 +48,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.wearable.MessageClient;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 import com.google.gson.Gson;
+
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.nononsenseapps.filepicker.AbstractFilePickerFragment;
@@ -64,9 +69,14 @@ import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import droidninja.filepicker.FilePickerBuilder;
+//import com.jakewharton.rxbinding.view.RxView;
+//import rx.Observable;
+//import rx.subscriptions.CompositeSubscription;
 
 import com.patloew.georeferencingsample.data.Car;
 import com.patloew.georeferencingsample.geoData.GeoLocation;
+//import com.patloew.rxwear.GoogleAPIConnectionException;
+//import com.patloew.rxwear.RxWear;
 
 
 import java.io.BufferedReader;
@@ -108,7 +118,23 @@ import java.util.concurrent.TimeUnit;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView,
+        MessageClient.OnMessageReceivedListener
+        {
+
+            @Override
+            public void onMessageReceived(@NonNull MessageEvent messageEvent) {
+
+                Log.d("sowa", "onMessageReceived() A message from watch was received:"
+                        + messageEvent.getRequestId() + " " + messageEvent.getPath() + messageEvent.getData()[0 ]);
+                /*String message = new String(messageEvent.getData());
+                Log.v(TAG, "Main activity received message: " + message);
+                // Display message in UI
+                logthis(message);
+                */
+
+                Toast.makeText(this, messageEvent.getData().toString(), Toast.LENGTH_LONG).show();
+            }
 
     private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance();
 
@@ -142,6 +168,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private RadioButton radioButtonPositionSource_distance = null;
     private RadioButton radioButtonPositionType_osnowa = null;
     private RadioButton radioButtonPositionType_lampion = null;
+
+    //private RxWear rxWear;
+    //private CompositeSubscription subscription = new CompositeSubscription();
+    //private Observable<Boolean> validator;
 
     SortableGeoLocationTableView geoTableView = null;
 
@@ -474,6 +504,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Wearable.getMessageClient(this).addListener(this);
+
         verifyStoragePermissions(this);
 /*
         mapView = findViewById(R.id.mapView);
@@ -603,6 +635,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         buttonSave = findViewById(R.id.buttonSave);
         buttonLoad = findViewById(R.id.buttonLoad);
+
+        //rxWear = new RxWear(this);
+
+
 
         buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
         buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
@@ -844,13 +880,78 @@ public class MainActivity extends AppCompatActivity implements MainView {
         });
 
 
+//        if(false) {
+//            subscription.add(RxView.clicks(buttonLoad)
+//                    .doOnNext(click -> {
+//                        Toast.makeText(this, "will message", Toast.LENGTH_SHORT).show();
+//                    })
+//                    //.flatMap(click2 -> {})
+//                    //.filter(isValid -> isValid)
+//                    .flatMap(valid -> rxWear.message().sendDataMapToAllRemoteNodes("/message")
+//                            .putString("title", "mrukwacz")
+//                            .putString("message", "hanba")
+//                            .toObservable()
+//                    ).subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+//                                    Toast.makeText(this, "sent message", Toast.LENGTH_LONG).show(),
+//                            // ,
+//                            throwable -> {
+//                                Log.e("MainActivity", "Error on sending message", throwable);
+//
+//                                if (throwable instanceof GoogleAPIConnectionException) {
+//                                    Toast.makeText(this, "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+//                                    //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+//                                } else {
+//                                    Toast.makeText(this, "Could not send message", Toast.LENGTH_LONG).show();
+//                                    //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+//                                }
+//                            })
+//            );
+//        }
 
 
 
         buttonLoad.setOnClickListener(new View.OnClickListener(){
             @Override public void onClick(View v){
 
-                startActivity(FILE_CODE_READ, FilePickerActivity.class);
+
+
+//                rxWear.message().sendDataMapToAllRemoteNodes("/message")
+//                        .putString("title", "mrukwacz")
+//                        .putString("message", "hanba")
+//                        .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+//                                Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
+//                        // ,
+//                        throwable -> {
+//                            Log.e("MainActivity", "Error on sending message", throwable);
+//
+//                            if (throwable instanceof GoogleAPIConnectionException) {
+//                                Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+//                                //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+//                            } else {
+//                                Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+//                                //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+//                            }
+//                        });
+//
+//                rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", "eeee").toObservable()
+//                        .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+//                                        Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
+//                                // ,
+//                                throwable -> {
+//                                    Log.e("MainActivity", "Error on sending message", throwable);
+//
+//                                    if (throwable instanceof GoogleAPIConnectionException) {
+//                                        Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+//                                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+//                                    } else {
+//                                        Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+//                                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+//                                    }
+//                                });
+//
+
+//                Toast.makeText(getApplicationContext(), "sent message?", Toast.LENGTH_LONG).show();
+                //startActivity(FILE_CODE_READ, FilePickerActivity.class);
                 /*
 
                 Intent i = new Intent(getBaseContext(), FilePickerActivity.class);
@@ -1039,6 +1140,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
 
 
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -1052,6 +1155,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onResume();
 
         checkPlayServicesAvailable();
+
+        Wearable.getMessageClient(this).addListener(this);
+
     }
 
     public String getRealPathFromURI(Uri contentUri) {
