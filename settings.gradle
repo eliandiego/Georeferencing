@@ -1,1 +1,1 @@
-include ':sample', ':geowear_wear'
+include ':sample', ':geowear_wear', ':geowearrx'

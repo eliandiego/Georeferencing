@@ -5,7 +5,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.example.geowearrx"
+        applicationId "com.patloew.georeferencingsample"
         minSdkVersion 23
         targetSdkVersion 26
         versionCode 1

@@ -69,14 +69,15 @@ import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import droidninja.filepicker.FilePickerBuilder;
+import rx.subscriptions.CompositeSubscription;
 //import com.jakewharton.rxbinding.view.RxView;
 //import rx.Observable;
 //import rx.subscriptions.CompositeSubscription;
 
 import com.patloew.georeferencingsample.data.Car;
 import com.patloew.georeferencingsample.geoData.GeoLocation;
-//import com.patloew.rxwear.GoogleAPIConnectionException;
-//import com.patloew.rxwear.RxWear;
+import com.patloew.rxwear.RxWear;
+import com.patloew.rxwear.GoogleAPIConnectionException;
 
 
 import java.io.BufferedReader;
@@ -118,6 +119,14 @@ import java.util.concurrent.TimeUnit;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
+
+// UWAGA UWAGA w gradle musi byc wszedzie to samo:         applicationId "com.patloew.georeferencingsample"
+// dla tel i zegarka, inaczej nie będzie komunikacji!
+
+// po wgraniu app na telefon trzeba nanowo wgrac na zegarek?
+
+// observable musi byc skonsumowane - wtedy dziala!
+// ale sie zatrzymuje przy wygaszeniu ekranu na telefonie? - aktualizacja pozycji?
 public class MainActivity extends AppCompatActivity implements MainView,
         MessageClient.OnMessageReceivedListener
         {
@@ -169,8 +178,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private RadioButton radioButtonPositionType_osnowa = null;
     private RadioButton radioButtonPositionType_lampion = null;
 
-    //private RxWear rxWear;
-    //private CompositeSubscription subscription = new CompositeSubscription();
+    private RxWear rxWear;
+    private CompositeSubscription subscription = new CompositeSubscription();
     //private Observable<Boolean> validator;
 
     SortableGeoLocationTableView geoTableView = null;
@@ -636,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonSave = findViewById(R.id.buttonSave);
         buttonLoad = findViewById(R.id.buttonLoad);
 
-        //rxWear = new RxWear(this);
+        rxWear = new RxWear(this);
 
 
 
@@ -915,42 +924,44 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
 
-//                rxWear.message().sendDataMapToAllRemoteNodes("/message")
-//                        .putString("title", "mrukwacz")
-//                        .putString("message", "hanba")
-//                        .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
-//                                Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
-//                        // ,
-//                        throwable -> {
-//                            Log.e("MainActivity", "Error on sending message", throwable);
-//
-//                            if (throwable instanceof GoogleAPIConnectionException) {
-//                                Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
-//                                //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
-//                            } else {
-//                                Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
-//                                //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
-//                            }
-//                        });
-//
-//                rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", "eeee").toObservable()
-//                        .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
-//                                        Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
-//                                // ,
-//                                throwable -> {
-//                                    Log.e("MainActivity", "Error on sending message", throwable);
-//
-//                                    if (throwable instanceof GoogleAPIConnectionException) {
-//                                        Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
-//                                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
-//                                    } else {
-//                                        Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
-//                                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
-//                                    }
-//                                });
-//
 
-//                Toast.makeText(getApplicationContext(), "sent message?", Toast.LENGTH_LONG).show();
+                String s2 = DATE_FORMAT.format(new Date());
+                rxWear.message().sendDataMapToAllRemoteNodes("/message")
+                        .putString("title", s2)
+                        .putString("message", "hanba")
+                        .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                                Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
+                        // ,
+                        throwable -> {
+                            Log.e("MainActivity", "Error on sending message", throwable);
+
+                            if (throwable instanceof GoogleAPIConnectionException) {
+                                Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                                //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                                //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+                rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable()
+                        .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                                        Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
+                                // ,
+                                throwable -> {
+                                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                                    if (throwable instanceof GoogleAPIConnectionException) {
+                                        Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
+
+
+                Toast.makeText(getApplicationContext(), "sent message?", Toast.LENGTH_LONG).show();
                 //startActivity(FILE_CODE_READ, FilePickerActivity.class);
                 /*
 
@@ -1342,6 +1353,57 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
         setNavigationToText(location);
+
+        String s = location.getLatitude() + ", " + location.getLongitude();
+        String s2 = DATE_FORMAT.format(new Date());
+
+        rxWear.message().sendDataMapToAllRemoteNodes("/message")
+                .putString("title", s)
+                .putString("message", s2)
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+        {},
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+          //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+            //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+        rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {},
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+//                .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+//                        Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
+//                // ,
+//                throwable -> {
+//                    Log.e("MainActivity", "Error on sending message", throwable);
+//
+//                    if (throwable instanceof GoogleAPIConnectionException) {
+//                        Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+//                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+//                    } else {
+//                        Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+//                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+//                    }
+//                });
 
 
     }

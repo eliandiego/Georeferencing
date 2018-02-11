@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.patloew.rxwear:rxwear-1.3.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxwear-1.3.0.aar/f1fae68b1a9302ef60607143add83848/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rxwear-1.3.0.aar/f1fae68b1a9302ef60607143add83848/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.patloew.rxwear/rxwear/1.3.0/6ad2b186adfe4c8227ac458809dc9a886ce9194f/rxwear-1.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
