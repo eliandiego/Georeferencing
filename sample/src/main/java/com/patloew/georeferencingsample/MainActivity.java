@@ -1,7 +1,6 @@
 package com.patloew.georeferencingsample;
 
 
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -58,12 +57,16 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.nononsenseapps.filepicker.AbstractFilePickerFragment;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.nononsenseapps.filepicker.Utils;
+import com.patloew.georeferencingsample.event.SimpleEvent;
+import com.patloew.georeferencingsample.service.MyService;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.georeferencingsample.data.DataFactory;
 
 import com.patloew.georeferencingsample.geoData.CalculateDistancesKt;
 
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import de.codecrafters.tableview.listeners.OnScrollListener;
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
@@ -79,6 +82,10 @@ import com.patloew.georeferencingsample.geoData.GeoLocation;
 import com.patloew.rxwear.RxWear;
 import com.patloew.rxwear.GoogleAPIConnectionException;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -128,22 +135,21 @@ import java.util.concurrent.TimeUnit;
 // observable musi byc skonsumowane - wtedy dziala!
 // ale sie zatrzymuje przy wygaszeniu ekranu na telefonie? - aktualizacja pozycji?
 public class MainActivity extends AppCompatActivity implements MainView,
-        MessageClient.OnMessageReceivedListener
-        {
+        MessageClient.OnMessageReceivedListener {
 
-            @Override
-            public void onMessageReceived(@NonNull MessageEvent messageEvent) {
+    @Override
+    public void onMessageReceived(@NonNull MessageEvent messageEvent) {
 
-                Log.d("sowa", "onMessageReceived() A message from watch was received:"
-                        + messageEvent.getRequestId() + " " + messageEvent.getPath() + messageEvent.getData()[0 ]);
+        Log.d("sowa", "onMessageReceived() A message from watch was received:"
+                + messageEvent.getRequestId() + " " + messageEvent.getPath() + messageEvent.getData()[0]);
                 /*String message = new String(messageEvent.getData());
                 Log.v(TAG, "Main activity received message: " + message);
                 // Display message in UI
                 logthis(message);
                 */
 
-                Toast.makeText(this, messageEvent.getData().toString(), Toast.LENGTH_LONG).show();
-            }
+        Toast.makeText(this, messageEvent.getData().toString(), Toast.LENGTH_LONG).show();
+    }
 
     private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance();
 
@@ -167,9 +173,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     private CheckBox checkBoxKeepScreenAlive;
 
-     private MapFragment mapFragment =  null;
-     private MapView mapView = null;
-     private CustomMapView customMapView = null;
+    private MapFragment mapFragment = null;
+    private MapView mapView = null;
+    private CustomMapView customMapView = null;
 
     private RxLocation rxLocation;
 
@@ -187,8 +193,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private EditText offsetX;
     private EditText offsetY;
 
-    static private int FILE_CODE_WRITE=147;
-    static private int FILE_CODE_READ=148;
+    static private int FILE_CODE_WRITE = 147;
+    static private int FILE_CODE_READ = 148;
 
     private RadioGroup radioGroupOsnowaLampion;
 
@@ -203,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private EditText editTextReferenceToPointNr;
 
     private EditText mackotext;
-    private GeoLocationDataAdapter geoAdapter= null;
+    private GeoLocationDataAdapter geoAdapter = null;
 
     private GoogleMap mapaGooglowa = null;
 
@@ -238,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    void setNavigationToPoint(GeoLocation target){
+    void setNavigationToPoint(GeoLocation target) {
         //navigateTo_TextView.
         navigationTarget = target;
         setNavigationToText(msLastLocation);
@@ -264,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    private List<GeoLocation> toLista(){
+    private List<GeoLocation> toLista() {
         List<GeoLocation> res = new ArrayList<>();
 
         for (GeoLocation e : GeoLocation.Repozytorium.getLocationPositions().values()) {
@@ -274,12 +280,11 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
-    private void serializeToFile(File f){
+    private void serializeToFile(File f) {
 
         HashMap<String, String> saved = new HashMap<String, String>();
         // kotlin: MutableMap<Int, GeoLocation>
         //HashMap<Integer, Location> m = GeoLocation.Repozytorium.getLocationPositions();
-
 
 
         String json = new Gson().toJson(GeoLocation.Repozytorium.getLocationPositions());
@@ -298,13 +303,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
             oos.flush();
             oos.close();
             fos.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "can write to file", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private void serializeToFile(){
+    private void serializeToFile() {
         //Map<Integer, GeoLocation> m = GeoLocation.Repozytorium.getLocationPositions();
         String json = new Gson().toJson(GeoLocation.Repozytorium.getLocationPositions());
 
@@ -320,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
             fos.write(json.getBytes());
             fos.close();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "can write to file", Toast.LENGTH_SHORT).show();
         }
 
@@ -335,12 +340,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
             fos2.write(json2.getBytes());
             fos2.close();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "can write to file", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private String getStringFromFile(File f){
+    private String getStringFromFile(File f) {
         Context context = this.getApplicationContext();
 
         StringBuilder textB = new StringBuilder();
@@ -355,8 +360,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 textB.append('\n');
             }
             br.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //You'll need to add proper error handling here
         }
 
@@ -364,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         return text;
     }
 
-    private String getStringFromFile(String fileName){
+    private String getStringFromFile(String fileName) {
         Context context = this.getApplicationContext();
         File path = context.getFilesDir();
         File file = new File(path, fileName);
@@ -380,8 +384,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 textB.append('\n');
             }
             br.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //You'll need to add proper error handling here
         }
 
@@ -389,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         return text;
     }
 
-    private void redrawTable(){
+    private void redrawTable() {
         geoTableView.invalidate();
         geoTableView.refreshDrawableState();
 
@@ -406,16 +409,15 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
-    private void deserializeFromFile(File f){
-
+    private void deserializeFromFile(File f) {
 
 
         //String text = getStringFromFile(f);
-        try{
+        try {
             FileInputStream fis = new FileInputStream(f);
 
             ObjectInputStream ois = new ObjectInputStream(fis);
-            HashMap<String,String> retreived = (HashMap<String,String>)ois.readObject();
+            HashMap<String, String> retreived = (HashMap<String, String>) ois.readObject();
             String t1 = retreived.get("A");
             String t2 = retreived.get("B");
 
@@ -427,27 +429,27 @@ public class MainActivity extends AppCompatActivity implements MainView,
             //gson.fromJson(text.toString(), Map<Integer, GeoLocation>);
             GeoLocation.Repozytorium.getMutableMapFromJsonLocationPositions(gson, t1);
             GeoLocation.Repozytorium.getMutableMapFromJsonPositionsUser(gson, t2);
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "can read from file", Toast.LENGTH_SHORT).show();
         }
         Toast.makeText(MainActivity.this, "data updated, size of table=" + GeoLocation.Repozytorium.getPositionsUser().size(), Toast.LENGTH_LONG).show();
-        redrawTable(); 
+        redrawTable();
     }
 
-    private void deserializeFromFile(){
+    private void deserializeFromFile() {
         //MutableMap<Int, GeoLocation> = mutableMapOf()
         //String json = new Gson().toJson(GeoLocation.Repozytorium.getLocationPositions());
         String text = getStringFromFile("oko.txt");
         String textP = getStringFromFile("oko2.txt");
 
-        try{
-          Gson gson = new Gson();
+        try {
+            Gson gson = new Gson();
             //Map<Integer, GeoLocation>
-          //gson.fromJson(text.toString(), object:MutableMap<Int, GeoLocation>);
+            //gson.fromJson(text.toString(), object:MutableMap<Int, GeoLocation>);
             //gson.fromJson(text.toString(), Map<Integer, GeoLocation>);
             GeoLocation.Repozytorium.getMutableMapFromJsonLocationPositions(gson, text.toString());
             GeoLocation.Repozytorium.getMutableMapFromJsonPositionsUser(gson, textP.toString());
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(MainActivity.this, "can write to file", Toast.LENGTH_SHORT).show();
         }
         Toast.makeText(MainActivity.this, "data updated, size of table=" + GeoLocation.Repozytorium.getPositionsUser().size(), Toast.LENGTH_LONG).show();
@@ -492,12 +494,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    private void configureCameraIdle(){
+    private void configureCameraIdle() {
         //GoogleMap.OnCameraIdleListener
     }
 
 
-    private void pickFile(){
+    private void pickFile() {
         ArrayList<String> filePaths = new ArrayList<>();
         FilePickerBuilder.getInstance().setMaxCount(10)
                 .setSelectedFiles(filePaths)
@@ -505,7 +507,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
         //.pickFile(this);
 
     }
-
 
 
     @Override
@@ -550,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 */
 
         customMapView = findViewById(R.id.mapView);
-        if( customMapView != null) {
+        if (customMapView != null) {
             customMapView.onCreate(null);
             customMapView.getMapAsync(new OnMapReadyCallback() {
 
@@ -574,18 +575,14 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     //googleMap.moveCamera(CameraUpdateFactory.newLatLng(52.1, -21.9));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(l));
                     //googleMap.setZ
-                    googleMap.animateCamera( CameraUpdateFactory.zoomTo( 17.0f ) );
+                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
 
                     mapaGooglowa = googleMap;
 
 
-
-
-
-                    googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+                    googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                         @Override
-                        public void onMapClick(LatLng arg0)
-                        {
+                        public void onMapClick(LatLng arg0) {
                             Log.d("KLIK", "klik");
                             //Toast.makeText(getBaseContext(), "klik", Toast.LENGTH_SHORT);
 
@@ -597,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         public void onMapLongClick(LatLng arg0) {
                             Log.d("KLIK", "LongKlik");
                             if (googleMap != null) {
-                                if(currentMarker != null)
+                                if (currentMarker != null)
                                     currentMarker.remove();
 
                                 currentMarker = googleMap.addMarker(new MarkerOptions()
@@ -613,8 +610,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     //Do what you want with the map!!
                 }
             });
-
-
 
 
             MapsInitializer.initialize(this);
@@ -645,13 +640,15 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonSave = findViewById(R.id.buttonSave);
         buttonLoad = findViewById(R.id.buttonLoad);
 
-        rxWear = new RxWear(this);
 
+
+
+        rxWear = new RxWear(this);
 
 
         buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
         buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
-        mackotext = findViewById(R.id.editText);
+        mackotext = findViewById(R.id.editTextName);
 
         radioButtonPositionSource_gps = findViewById(R.id.radioButtonPositionSource_GPS);
         radioButtonPositionSource_distance = findViewById(R.id.radioButtonPositionSource_measure);
@@ -673,10 +670,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
         //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
         //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
 
-        checkBoxKeepScreenAlive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        checkBoxKeepScreenAlive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // update your model (or other business logic) based on isChecked
-                if(isChecked)
+                if (isChecked)
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 else {
                     getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -691,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         //final SortableGeoLocationTableView geoTableView = findViewById(R.id.tableViewGeo);
         geoTableView = findViewById(R.id.tableViewGeo);
-        if(geoTableView != null){
+        if (geoTableView != null) {
             geoTableView.setScrollBarSize(3);
             geoTableView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
             //geoTableView.setScrollContainer(true);
@@ -700,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
             geoAdapter = new GeoLocationDataAdapter(this,
-            //        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositions(), // ok ale sa niepotrzebne tez
+                    //        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositions(), // ok ale sa niepotrzebne tez
                     //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredPositions(), // nie uaktualnia sie
                     //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), // nie uaktualnia sie
                     //toLista(),
@@ -740,7 +737,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         radioGroupOsnowaLampion.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(radioButtonPositionType_osnowa.isChecked())
+                if (radioButtonPositionType_osnowa.isChecked())
                     radioButtonPositionSource_distance.setText("Marker");
                 else
                     radioButtonPositionSource_distance.setText("distance");
@@ -748,12 +745,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
         });
 
         radioGroupReferenceToZeroPoint.setOnClickListener(new View.OnClickListener() {
-                                                              @Override
-                                                              public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-                                                                  editTextReferenceToPointNr.setText("");
-                                                              }
-                                                          });
+                editTextReferenceToPointNr.setText("");
+            }
+        });
 
 
 
@@ -813,10 +810,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
 */
 
         //radioButtonPositionType_osnowa.setOnClickListener(new View);
-        radioButtonPositionType_osnowa.setOnFocusChangeListener(new View.OnFocusChangeListener(){
+        radioButtonPositionType_osnowa.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus){
-                if(hasFocus)
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus)
                     radioButtonPositionSource_distance.setText("Marker");
                 else
                     radioButtonPositionSource_distance.setText("distance");
@@ -824,9 +821,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
         });
 
 
-        centerMap.setOnClickListener(new View.OnClickListener(){
+        centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 LatLng l = new LatLng(msLastLocation.getLatitude(), msLastLocation.getLongitude());
 
                 //googleMap.moveCamera(CameraUpdateFactory.newLatLng(52.1, -21.9));
@@ -836,14 +833,14 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
         buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
-                                                      @Override
-                                                      public void onClick(View v) {
-                                                          Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
-                                                          Log.d("SSR", "odleglosci");
-                                                          CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
-                                                          Log.d("SSR", "lampiony obliczone");
-                                                      }
-                                                  });
+            @Override
+            public void onClick(View v) {
+                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+                Log.d("SSR", "odleglosci");
+                CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
+                Log.d("SSR", "lampiony obliczone");
+            }
+        });
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -854,8 +851,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         });
 
-        buttonSave.setOnClickListener(new View.OnClickListener(){
-            @Override public void onClick(View v){
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
                 serializeToFile();
 
@@ -882,8 +880,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 */
 
             }
-
-
 
 
         });
@@ -918,9 +914,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
 //        }
 
 
-
-        buttonLoad.setOnClickListener(new View.OnClickListener(){
-            @Override public void onClick(View v){
+        buttonLoad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
 
 
@@ -990,29 +986,27 @@ public class MainActivity extends AppCompatActivity implements MainView,
         });
 
 
-
         buttonRemove.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                            if(navigationTarget == null)
-                                                return;
+                                            @Override
+                                            public void onClick(View v) {
+                                                if (navigationTarget == null)
+                                                    return;
 
-                                           int nr = navigationTarget.getNum();
+                                                int nr = navigationTarget.getNum();
 
-                                           GeoLocation.Repozytorium.getPositionsUser().remove(navigationTarget);
-                                           GeoLocation.Repozytorium.getLocationPositions().remove(nr);
-                                           geoAdapter.notifyDataSetInvalidated();
-                                           geoAdapter.notifyDataSetChanged();
+                                                GeoLocation.Repozytorium.getPositionsUser().remove(navigationTarget);
+                                                GeoLocation.Repozytorium.getLocationPositions().remove(nr);
+                                                geoAdapter.notifyDataSetInvalidated();
+                                                geoAdapter.notifyDataSetChanged();
 
-                                       }
-                                   }
-            );
+                                            }
+                                        }
+        );
 
 
-                button2.setOnClickListener(new View.OnClickListener()
-        {
+        button2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick (View v){
+            public void onClick(View v) {
                 Log.d("SSR", "blebe");
                 Location l = new Location("");
 
@@ -1022,25 +1016,24 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 Double offY = Double.parseDouble(offsetY.getText().toString());
 
                 int refPointNr = 0;
-                if(!radioGroupReferenceToZeroPoint.isChecked()){
+                if (!radioGroupReferenceToZeroPoint.isChecked()) {
                     String s = editTextReferenceToPointNr.getText().toString();
-                    try{
+                    try {
                         refPointNr = Integer.parseInt(s);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         refPointNr = 0;
                     }
                 }
 
-                if(radioButtonPositionType_osnowa.isChecked()){
+                if (radioButtonPositionType_osnowa.isChecked()) {
 
-                    if((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()){
+                    if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
                         Toast.makeText(getBaseContext(), "both offs can be 0.0 for osnowa!", Toast.LENGTH_LONG).show();
                         return;
                     }
 
 
-
-                    if(radioButtonPositionSource_gps.isChecked()){
+                    if (radioButtonPositionSource_gps.isChecked()) {
 
                         // gps
 
@@ -1054,10 +1047,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromGPS(l, refPointNr, offX, offY);
 
 
+                    } else if (radioButtonPositionSource_distance.isChecked()) {
 
-                    } else if(radioButtonPositionSource_distance.isChecked()){
-
-                        if(currentMarker == null){
+                        if (currentMarker == null) {
                             Toast.makeText(getBaseContext(), "no marker!", Toast.LENGTH_LONG).show();
                             return;
                         }
@@ -1069,23 +1061,21 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                     }
 
-                } else if(radioButtonPositionType_lampion.isChecked()){
+                } else if (radioButtonPositionType_lampion.isChecked()) {
                     // lampion
 
 
-
-                    if(radioButtonPositionSource_gps.isChecked()){
-
+                    if (radioButtonPositionSource_gps.isChecked()) {
 
 
-                    } else if(radioButtonPositionSource_distance.isChecked()){
+                    } else if (radioButtonPositionSource_distance.isChecked()) {
 
-                        if((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()){
+                        if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
                             Toast.makeText(getBaseContext(), "both offs can be 0.0 for lampion!", Toast.LENGTH_LONG).show();
                             return;
                         }
 
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint( refPointNr, offX, offY);
+                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint(refPointNr, offX, offY);
                     }
                 }
 
@@ -1107,7 +1097,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 geoAdapter.notifyDataSetChanged();
 
 
-                    //geoTableView.refreshDrawableState();
+                //geoTableView.refreshDrawableState();
 
                 GeoLocation.Repozytorium.writePositionsToFile();
                 String s = GeoLocation.Repozytorium.readFromFile();
@@ -1116,8 +1106,11 @@ public class MainActivity extends AppCompatActivity implements MainView,
             }
         });
 
+        startService(new Intent(this, MyService.class));
     }
 
+
+    // onCreate end
 
     protected void startActivity(final int code, final Class<?> klass) {
         final Intent i = new Intent(this, klass);
@@ -1136,11 +1129,11 @@ public class MainActivity extends AppCompatActivity implements MainView,
         i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_NEW_FILE);
 
         File manewryFolder = new File(getFilesDir().getAbsolutePath() + "/manewry");
-        if(!manewryFolder.exists())
+        if (!manewryFolder.exists())
             manewryFolder.mkdir();
 
         addressText.setText(getFilesDir().getAbsolutePath());
-        i.putExtra(FilePickerActivity.EXTRA_START_PATH, getFilesDir().getAbsolutePath()+ "/manewry/ee.txt");
+        i.putExtra(FilePickerActivity.EXTRA_START_PATH, getFilesDir().getAbsolutePath() + "/manewry/ee.txt");
 //        i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath() + "/manewry/ee.txt");
 
         // This line is solely so that test classes can override intents given through UI
@@ -1150,13 +1143,14 @@ public class MainActivity extends AppCompatActivity implements MainView,
     }
 
 
-
-
-
     @Override
     protected void onStart() {
         super.onStart();
         presenter.attachView(this);
+
+        EventBus.getDefault().register(this);
+
+
     }
 
     @Override
@@ -1172,7 +1166,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
     }
 
     public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
+        String[] proj = {MediaStore.Images.Media.DATA};
 
         //This method was deprecated in API level 11
         //Cursor cursor = managedQuery(contentUri, proj, null, null, null);
@@ -1200,8 +1194,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
             // Use the provided utility method to parse the
             //com.nononsenseapps.filepicker.Utils.
             List<Uri> files = Utils.getSelectedFilesFromResult(data);
-            locationText.setText( " S=" + files.size() );
-            for (Uri uri: files) {
+            locationText.setText(" S=" + files.size());
+            for (Uri uri : files) {
                 locationText.setText(locationText.getText() + uri.toString());
 
                 File f = null;
@@ -1222,13 +1216,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     e.printStackTrace();
                 }
 
-                if(FILE_CODE_READ == requestCode){
+                if (FILE_CODE_READ == requestCode) {
                     deserializeFromFile(f);
-                } else if(FILE_CODE_WRITE == requestCode) {
+                } else if (FILE_CODE_WRITE == requestCode) {
 
                     String data2 = "bobo";
 
-                    try{
+                    try {
                         if (!f.exists())
                             f.createNewFile();
 
@@ -1253,8 +1247,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
             }
             return;
         }
-        switch (requestCode)
-        {
+        switch (requestCode) {
 
             /*
             case FilePickerConst.REQUEST_CODE_DOC:
@@ -1273,13 +1266,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
     }
 
 
-
     private void checkPlayServicesAvailable() {
         final GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         final int status = apiAvailability.isGooglePlayServicesAvailable(this);
 
-        if(status != ConnectionResult.SUCCESS) {
-            if(apiAvailability.isUserResolvableError(status)) {
+        if (status != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(status)) {
                 apiAvailability.getErrorDialog(this, status, 1).show();
             } else {
                 Snackbar.make(lastUpdate, "Google Play Services unavailable. This app will not work", Snackbar.LENGTH_INDEFINITE).show();
@@ -1307,7 +1299,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.menu_licenses) {
+        if (item.getItemId() == R.id.menu_licenses) {
             new LibsBuilder()
                     .withFields(Libs.toStringArray(R.string.class.getFields()))
                     .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
@@ -1323,9 +1315,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     // View Interface
 
-    private void setNavigationToText(Location loc){
+    private void setNavigationToText(Location loc) {
 
-        if(navigationTarget == null){
+        if (navigationTarget == null) {
             navigateTo_TextView.setText("no point set");
             return;
         }
@@ -1361,22 +1353,24 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 .putString("title", s)
                 .putString("message", s2)
                 .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
-        {},
+                {
+                },
                 // ,
                 throwable -> {
                     Log.e("MainActivity", "Error on sending message", throwable);
 
                     if (throwable instanceof GoogleAPIConnectionException) {
-          //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
                         //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
                     } else {
-            //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                     }
                 });
 
         rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
-                {},
+                {
+                },
                 // ,
                 throwable -> {
                     Log.e("MainActivity", "Error on sending message", throwable);
@@ -1420,41 +1414,60 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 .show();
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onEvent(SimpleEvent event) {
+
+        //@Bind(R.id.editTextName) EditText editTextName;
+        EditText et = ButterKnife.findById(this, R.id.editTextName);
+        et.setText(event.getDate().toString());
+
+    }
+
     private String getAddressText(Address address) {
         String addressText = "";
         final int maxAddressLineIndex = address.getMaxAddressLineIndex();
 
-        for(int i=0; i<=maxAddressLineIndex; i++) {
+        for (int i = 0; i <= maxAddressLineIndex; i++) {
             addressText += address.getAddressLine(i);
-            if(i != maxAddressLineIndex) { addressText += "\n"; }
+            if (i != maxAddressLineIndex) {
+                addressText += "\n";
+            }
         }
 
         return addressText;
     }
 
-    private void DrawMarkers(List<GeoLocation> locations){
+    private void DrawMarkers(List<GeoLocation> locations) {
 
-        for(GeoLocation g : locations){
+        for (GeoLocation g : locations) {
 
             Location l = g.getLocation();
-            if(l != null){
+            if (l != null) {
 
                 LatLng ll = new LatLng(l.getLatitude(), l.getLongitude());
 
                 String desc = "";
                 float kolor = BitmapDescriptorFactory.HUE_CYAN;
 
-                switch(g.getType()){
-                    case OSNOWA_MARKER: desc = "OS_mark_"; kolor = BitmapDescriptorFactory.HUE_BLUE; break;
-                    case OSNOWA_GPS: desc = "OS_gps_";kolor = BitmapDescriptorFactory.HUE_AZURE; break;
-                    case LAMPION_MARKER: desc = "LA_mark_"; kolor = BitmapDescriptorFactory.HUE_ORANGE; break;
-                    case LAMPION_OFF: desc = "LA_off_";kolor = BitmapDescriptorFactory.HUE_RED; break;
+                switch (g.getType()) {
+                    case OSNOWA_MARKER:
+                        desc = "OS_mark_";
+                        kolor = BitmapDescriptorFactory.HUE_BLUE;
+                        break;
+                    case OSNOWA_GPS:
+                        desc = "OS_gps_";
+                        kolor = BitmapDescriptorFactory.HUE_AZURE;
+                        break;
+                    case LAMPION_MARKER:
+                        desc = "LA_mark_";
+                        kolor = BitmapDescriptorFactory.HUE_ORANGE;
+                        break;
+                    case LAMPION_OFF:
+                        desc = "LA_off_";
+                        kolor = BitmapDescriptorFactory.HUE_RED;
+                        break;
                 }
-
-
-
-
-
 
 
                 desc += g.getNum();
