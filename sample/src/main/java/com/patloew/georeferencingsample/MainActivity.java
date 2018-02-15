@@ -923,6 +923,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
             @Override
             public void onClick(View v) {
 
+                /*
                 String s2 = DATE_FORMAT.format(new Date());
                 rxWear.message().sendDataMapToAllRemoteNodes("/message")
                         .putString("title", s2)
@@ -941,7 +942,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                                 //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                             }
                         });
-
+*/
                 /*
                 rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable()
                         .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
@@ -1352,8 +1353,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         setNavigationToText(location);
 
+        /*
         String s = location.getLatitude() + ", " + location.getLongitude();
         String s2 = DATE_FORMAT.format(new Date());
+
 
         rxWear.message().sendDataMapToAllRemoteNodes("/message")
                 .putString("title", s)
@@ -1373,7 +1376,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                     }
                 });
-
+*/
         /*
         rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
                 {

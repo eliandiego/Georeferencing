@@ -1,6 +1,5 @@
 package com.patloew.georeferencingsample.service;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +22,7 @@ import com.patloew.rxwear.RxWear;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,21 +36,33 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+
+
 /**
  * Created by gunhansancar on 06/04/16.
  */
 public class MyService extends Service {
 
-    private RxWear rxWear;
+
+    public interface WearChannelModes {
+
+        String MESSAGE = "/message";
+        String PERSISTENT = "/persistentText";
+    }
+
+
+
+
+    static private RxWear rxWear;
 
     private static final String TAG = "BOOMBOOMTESTGPS";
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
-    private final RxLocation rxLocation;
+    private RxLocation rxLocation;
     private final LocationRequest locationRequest;
-    private AtomicInteger currentMS;
+    private AtomicInteger currentMS = new AtomicInteger(0);
 
     private CompositeSubscription subscription = new CompositeSubscription();
 
@@ -112,9 +124,11 @@ public class MyService extends Service {
         EventBus.getDefault().register(this);
 
         rxWear = new RxWear(getApplicationContext());
+        rxLocation = new RxLocation(getApplicationContext());
+        rxLocation.setDefaultTimeout(15, TimeUnit.SECONDS);
 
         startTimer();
-        //startLocationRefresh();
+        startRxLocationRefresh();
 
         initializeLocationManager();
         try {
@@ -175,6 +189,11 @@ public class MyService extends Service {
         @Override
         public void run() {
             EventBus.getDefault().postSticky(new SimpleEvent(current.addAndGet(1)));
+
+            Calendar calendar = Calendar.getInstance();
+
+            String s = "sec=" + calendar.get(Calendar.SECOND);
+            //sendToWear(s);
         }
     }
 
@@ -182,11 +201,19 @@ public class MyService extends Service {
 
     }
 
+    // rxLocation
     public void onLocationUpdate(Location location) {
        EventBus.getDefault().postSticky(new SimpleEvent(currentMS.addAndGet(1)));
+       String s = location.getLatitude() + "/" + location.getLongitude();
+       Calendar calendar = Calendar.getInstance();
+
+       String s2 = "sec=" + calendar.get(Calendar.SECOND);
+        Log.e("MyService", "poz rxLocation=" + s + "/" + s2);
+
+       sendToWearMessage(s, "rxLocation" + s2);
     }
 
-    public void startLocationRefresh() {
+    public void startRxLocationRefresh() {
 
         disposable.add(
                 rxLocation.settings().checkAndHandleResolution(locationRequest)
@@ -233,6 +260,47 @@ public class MyService extends Service {
         }
     }
 
+    static private void sendToWear(String s){
+        rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
+    static private void sendToWearMessage(String s, String s2){
+        rxWear.message().sendDataMapToAllRemoteNodes("/message")
+                .putString("title", s)
+                .putString("message", s2)
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -252,22 +320,7 @@ public class MyService extends Service {
 
 
             String s2 = "mee" + location.getLatitude();
-            rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
-                    {
-                    },
-                    // ,
-                    throwable -> {
-                        Log.e("MainActivity", "Error on sending message", throwable);
-
-                        if (throwable instanceof GoogleAPIConnectionException) {
-                            //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
-                            //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
-                        } else {
-                            //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
-                            //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
-                        }
-                    });
-
+            sendToWear(s2);
 
 
         }
