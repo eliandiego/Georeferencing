@@ -60,7 +60,7 @@ public class MainPresenter {
 
         disposable.add(
                 rxLocation.settings().checkAndHandleResolution(locationRequest)
-                        .flatMapObservable(this::getAddressObservable)
+                        .flatMapObservable(this::getAddressObservable) // arg -> Boolean, result -> Address
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(view::onAddressUpdate, throwable -> Log.e("MainPresenter", "Error fetching location/address updates", throwable))
         );

@@ -512,7 +512,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.activity_main);
+
+        rxWear = new RxWear(this);
 
         Wearable.getMessageClient(this).addListener(this);
 
@@ -643,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
 
-        rxWear = new RxWear(this);
+
 
 
         buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
@@ -918,9 +923,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
             @Override
             public void onClick(View v) {
 
-
-
-
                 String s2 = DATE_FORMAT.format(new Date());
                 rxWear.message().sendDataMapToAllRemoteNodes("/message")
                         .putString("title", s2)
@@ -940,6 +942,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                             }
                         });
 
+                /*
                 rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable()
                         .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
                                         Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
@@ -955,7 +958,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                                     }
                                 });
-
+                */
 
                 Toast.makeText(getApplicationContext(), "sent message?", Toast.LENGTH_LONG).show();
                 //startActivity(FILE_CODE_READ, FilePickerActivity.class);
@@ -1106,7 +1109,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
             }
         });
 
-        startService(new Intent(this, MyService.class));
+        startService(new Intent(this, MyService.class)); // ok ale zwraca null w service
+        //startService(new Intent(getApplicationContext(), MyService.class));
+
     }
 
 
@@ -1148,7 +1153,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
         super.onStart();
         presenter.attachView(this);
 
-        EventBus.getDefault().register(this);
+        if(!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
 
 
     }
@@ -1368,6 +1374,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     }
                 });
 
+        /*
         rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s2).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
                 {
                 },
@@ -1383,6 +1390,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                     }
                 });
+*/
 
 //                .subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
 //                        Toast.makeText(getApplicationContext(), "sent message", Toast.LENGTH_LONG).show(),
