@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         rxWear = new RxWear(this);
 
+        
         Wearable.getMessageClient(this).addListener(this);
 
         verifyStoragePermissions(this);

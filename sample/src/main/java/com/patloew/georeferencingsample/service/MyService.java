@@ -261,12 +261,13 @@ public class MyService extends Service {
     }
 
     static private void sendToWear(String s){
+        Log.e("MyService", "sendToWear:" + s );
         rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
                 {
                 },
                 // ,
                 throwable -> {
-                    Log.e("MainActivity", "Error on sending message", throwable);
+                    Log.e("MainActivity", "Error on sending (Data) message", throwable);
 
                     if (throwable instanceof GoogleAPIConnectionException) {
                         //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
@@ -280,6 +281,7 @@ public class MyService extends Service {
     }
 
     static private void sendToWearMessage(String s, String s2){
+        Log.e("MyService", "sendToWearMessage:" + s + "," + s2);
         rxWear.message().sendDataMapToAllRemoteNodes("/message")
                 .putString("title", s)
                 .putString("message", s2)
