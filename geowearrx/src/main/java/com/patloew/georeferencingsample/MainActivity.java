@@ -1,8 +1,13 @@
 package com.patloew.georeferencingsample;
 
+import static butterknife.ButterKnife.findById;
+
+
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,16 +17,22 @@ import com.patloew.georeferencingsample.R;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.MessageApi;
+import com.patloew.rxwear.GoogleAPIConnectionException;
 import com.patloew.rxwear.RxWear;
 import com.patloew.rxwear.transformers.DataEventGetDataMap;
 import com.patloew.rxwear.transformers.DataItemGetDataMap;
 import com.patloew.rxwear.transformers.MessageEventGetDataMap;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
 import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends WearableActivity {
+
+    private static final String TAG = "WearMainActivity";
+
 
     private BoxInsetLayout mContainerView;
     private TextView mTitleText;
@@ -38,8 +49,15 @@ public class MainActivity extends WearableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //ButterKnife.bind(this, this.get);
+        //ButterKnife.bind(MainActivity.this);
+
         setContentView(R.layout.activity_main);
+
         setAmbientEnabled();
+        // musi byc po setContentView!
+        ButterKnife.bind(this);
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTitleText = (TextView) findViewById(R.id.title);
@@ -128,4 +146,35 @@ public class MainActivity extends WearableActivity {
         }
         */
     }
+
+
+    void sendToMobile(String s, String s2){
+        rxWear.message().sendDataMapToAllRemoteNodes("/messageFromWear")
+                .putString("title", s)
+                .putString("message", s2)
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e(TAG, "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+    }
+
+    @OnClick(R.id.buttonMS)
+    public void submit(View view) {
+        Log.i(TAG, "klikneli mnie!");
+        sendToMobile("baba", "zaba");
+
+    }
+
 }

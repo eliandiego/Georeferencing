@@ -10,14 +10,18 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.os.Bundle;
+import android.widget.Toast;
 
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.wearable.MessageApi;
+import com.patloew.georeferencingsample.R;
 import com.patloew.georeferencingsample.event.ServiceEvent;
 import com.patloew.georeferencingsample.event.SimpleEvent;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.rxwear.GoogleAPIConnectionException;
 import com.patloew.rxwear.RxWear;
+import com.patloew.rxwear.transformers.MessageEventGetDataMap;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -64,7 +68,9 @@ public class MyService extends Service {
     private final LocationRequest locationRequest;
     private AtomicInteger currentMS = new AtomicInteger(0);
 
-    private CompositeSubscription subscription = new CompositeSubscription();
+    //private CompositeSubscription subscription = new CompositeSubscription();
+    private CompositeDisposable subscription = new CompositeDisposable();
+
 
     private LocationManager mLocationManager = null;
 
@@ -124,8 +130,21 @@ public class MyService extends Service {
         EventBus.getDefault().register(this);
 
         rxWear = new RxWear(getApplicationContext());
+
+
+        subscription.add(rxWear.message().listen("/messageFromWear", MessageApi.FILTER_LITERAL)
+                .compose(MessageEventGetDataMap.noFilter())
+                .subscribe(dataMap -> {
+                    Log.e(TAG, "got from wear title:" + dataMap.getString("title", "no text") );
+                    Log.e(TAG, "got from wear title:" + dataMap.getString("message", "no text"));
+                }, throwable -> Toast.makeText(this, "Error on message listen", Toast.LENGTH_LONG)));
+
+
         rxLocation = new RxLocation(getApplicationContext());
         rxLocation.setDefaultTimeout(15, TimeUnit.SECONDS);
+
+
+
 
         startTimer();
         startRxLocationRefresh();
