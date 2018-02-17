@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.patloew.georeferencingsample.R;
 import com.patloew.georeferencingsample.event.ServiceEvent;
@@ -223,6 +224,7 @@ public class MyService extends Service {
     // rxLocation
     public void onLocationUpdate(Location location) {
        EventBus.getDefault().postSticky(new SimpleEvent(currentMS.addAndGet(1)));
+
        String s = location.getLatitude() + "/" + location.getLongitude();
        Calendar calendar = Calendar.getInstance();
 
@@ -230,6 +232,7 @@ public class MyService extends Service {
         Log.e("MyService", "poz rxLocation=" + s + "/" + s2);
 
        sendToWearMessage(s, "rxLocation" + s2);
+       sendToWearLocation(location);
     }
 
     public void startRxLocationRefresh() {
@@ -321,6 +324,58 @@ public class MyService extends Service {
                 });
 
     }
+
+    static private void sendToWearLocation(Location l){
+
+        DataMap dm = new DataMap();
+
+
+        Log.e("MyService", "sendToWearLocation:" + l.toString());
+        /*
+        rxWear.message().sendDataMapToAllRemoteNodes("/location")
+                .putDouble("latitude", l.getLatitude())
+                .putDouble("longitude", l.getLongitude())
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+                */
+
+        rxWear.data().putDataMap().urgent().to("/location")
+                .putDouble("latitude", l.getLatitude())
+                .putDouble("longitude", l.getLongitude())
+                .putFloat("accuracy", l.getAccuracy())
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending (Data) message", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+
+
+    }
+
 
 
     private class LocationListener implements android.location.LocationListener

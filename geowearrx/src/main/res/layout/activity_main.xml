@@ -24,9 +24,8 @@
                 android:id="@+id/persistent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
                 android:text="@string/no_message"
-                style="@style/TextAppearance.Wearable.Medium"/>
+                android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/title"
@@ -35,15 +34,29 @@
                 android:layout_marginTop="8dp"
                 android:textAlignment="center"
                 android:text="@string/no_message"
-                style="@style/TextAppearance.Wearable.Small"/>
+                />
+            <!--style="@style/TextAppearance.Wearable.Small"
+            style="@style/TextAppearance.Wearable.Medium"
+            -->
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
+                <Button
+                    android:id="@+id/buttonMS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="29dp"
+                    android:text="ChgPoint" />
 
-            <Button
-                android:id="@+id/buttonMS"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Button" />
+                <Button
+                    android:id="@+id/buttonSetDist"
+                    android:layout_width="match_parent"
+                    android:layout_height="29dp"
+                    android:text="SetDist" />
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/message"
@@ -60,7 +73,16 @@
                 android:layout_height="wrap_content"
                 android:text="TextView" />
 
+
+
+            <TextView
+                android:id="@+id/textViewDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
         </LinearLayout>
+
 
 
 
