@@ -3,9 +3,11 @@ package com.patloew.georeferencingsample.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -221,7 +223,7 @@ public class MyService extends Service {
 
     }
 
-    // rxLocation
+    // rxLocation zdarzenie
     public void onLocationUpdate(Location location) {
        EventBus.getDefault().postSticky(new SimpleEvent(currentMS.addAndGet(1)));
 
@@ -231,7 +233,7 @@ public class MyService extends Service {
        String s2 = "sec=" + calendar.get(Calendar.SECOND);
         Log.e("MyService", "poz rxLocation=" + s + "/" + s2);
 
-       sendToWearMessage(s, "rxLocation" + s2);
+       sendToWearMessage(s, "swm_rxLoc" + s2);
        sendToWearLocation(location);
     }
 
@@ -282,8 +284,9 @@ public class MyService extends Service {
         }
     }
 
-    static private void sendToWear(String s){
-        Log.e("MyService", "sendToWear:" + s );
+    // tego uzywamy do interfejsu nie-rxLocation
+    static private void sendToWearData(String s){
+        Log.e("MyService", "sendToWearData:" + s );
         rxWear.data().putDataMap().urgent().to("/persistentText").putString("text", s).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
                 {
                 },
@@ -325,6 +328,54 @@ public class MyService extends Service {
 
     }
 
+    static private void sendToWearDoubleMessage(String path, String topic, Double value){
+
+        rxWear.message().sendDataMapToAllRemoteNodes(path)
+                .putDouble(topic, value)
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                    Log.e("MainActivity", "Sent location");
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending location", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+
+    }
+
+
+    static private void sendToWearFloatMessage(String path, String topic, float value){
+
+        rxWear.message().sendDataMapToAllRemoteNodes(path)
+                .putFloat(topic, value)
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                    Log.e("MainActivity", "Sent location");
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending location", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+
+    }
     static private void sendToWearLocation(Location l){
 
         DataMap dm = new DataMap();
@@ -351,7 +402,8 @@ public class MyService extends Service {
                     }
                 });
                 */
-
+        // jako data - nie dziala dobrze, tylko na poczatku uaktualnia...
+        /*
         rxWear.data().putDataMap().urgent().to("/location")
                 .putDouble("latitude", l.getLatitude())
                 .putDouble("longitude", l.getLongitude())
@@ -371,9 +423,53 @@ public class MyService extends Service {
                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                     }
                 });
+*/
+// jako message:
+/*
+        rxWear.message().sendDataMapToAllRemoteNodes("/location")
+                .putDouble("latitude", l.getLatitude())
+                .putDouble("longitude", l.getLongitude())
+                .putFloat("accuracy", l.getAccuracy())
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                    Log.e("MainActivity", "Sent location");
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending location", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+*/
+
+        sendToWearDoubleMessage("/location", "latitude", l.getLatitude());
+        sendToWearDoubleMessage("/location", "longitude", l.getLongitude());
+        sendToWearFloatMessage("/location", "accuracy", l.getAccuracy());
+
+    }
 
 
 
+    public String getBatteryLevel() {
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+// Error checking that probably isn't needed but I added just in case.
+        if(level == -1 || scale == -1) {
+            return "error";
+        }
+
+
+        float batteryLevelWithDecimals = ((float)level / (float)scale) * 100.0f;
+        String battery = String.format("%.0f", batteryLevelWithDecimals);
+        return battery ;
     }
 
 
@@ -396,7 +492,7 @@ public class MyService extends Service {
 
 
             String s2 = "mee" + location.getLatitude();
-            sendToWear(s2);
+            sendToWearData(s2);
 
 
         }

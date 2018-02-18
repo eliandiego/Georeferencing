@@ -5,8 +5,10 @@ import static butterknife.ButterKnife.findById;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -23,6 +25,10 @@ import com.patloew.rxwear.RxWear;
 import com.patloew.rxwear.transformers.DataEventGetDataMap;
 import com.patloew.rxwear.transformers.DataItemGetDataMap;
 import com.patloew.rxwear.transformers.MessageEventGetDataMap;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -48,6 +54,8 @@ public class MainActivity extends WearableActivity {
     private RxWear rxWear;
 
     private Location lastValidLocation = null;
+    private Boolean isLastValid = false;
+    private Time lastValidLocationRcvDate = new Time();
     private Location pinLocation = null;
 
     @Override
@@ -79,14 +87,32 @@ public class MainActivity extends WearableActivity {
 
         //EventBus.getDefault().register(this);
 
+
+
+        Handler handler = new Handler();
+// Define the code block to be executed
+        Runnable runnableCode = new Runnable() {
+            @Override
+            public void run() {
+                // Do something here on the main thread
+                updateDisplayedData();
+                Log.d("Handlers", "Called on main thread");
+                handler.postDelayed(this, 1000);
+            }
+        };
+// Run the above code block on the main thread after 2 seconds
+        handler.postDelayed(runnableCode, 1000);
+
+
         // 1.3
-// to message
+// to message // mee... (z rxLocation)
         subscription.add(rxWear.message().listen("/message", MessageApi.FILTER_LITERAL)
                 .compose(MessageEventGetDataMap.noFilter())
                 .subscribe(dataMap -> {
                     mTitleText.setText(dataMap.getString("title", getString(R.string.no_message)));
                     mMessageText.setText(dataMap.getString("message", getString(R.string.no_message_info)));
-                }, throwable -> Toast.makeText(this, "Error on message listen", Toast.LENGTH_LONG)));
+                    Log.d(TAG, "got /message");
+                }, throwable -> Log.d(TAG, "Error on message listen for /message")));
 
 /*
         subscription.add(
@@ -98,44 +124,78 @@ public class MainActivity extends WearableActivity {
                         throwable -> Toast.makeText(this, "Error on data listen", Toast.LENGTH_LONG))
         );
 */
-
+// data w formie stringu lat/long (nie z rxLocation)
         io.reactivex.Observable<DataMap> o = rxWear.data().get("/persistentText").compose(DataItemGetDataMap.noFilter());
 
         io.reactivex.Observable<DataMap> m = rxWear.data().listen("/persistentText", DataApi.FILTER_LITERAL).
                 compose(DataEventGetDataMap.filterByType(DataEvent.TYPE_CHANGED));
-
-
-// a to data
         io.reactivex.Observable<DataMap> om = io.reactivex.Observable.concat(o,m);
         subscription.add(om.map(dataMap -> dataMap.get("text"))
                 .subscribe(   text -> {mPersistentText.setText((String)text); mText2.setText((String)text); Log.e(TAG, "got persistentText");},
-                throwable -> Toast.makeText(this, "Error on data listen", Toast.LENGTH_LONG))
-        );
+                        throwable -> Log.d(TAG, "Error on data listen for persistenttext")));
 
 
+
+        // ------------------------- location
+        // jako data (zle dziala)
+        /*
         io.reactivex.Observable<DataMap> ol = rxWear.data().get("/location").compose(DataItemGetDataMap.noFilter());
 
         io.reactivex.Observable<DataMap> ml = rxWear.data().listen("/location", DataApi.FILTER_LITERAL).
                 compose(DataEventGetDataMap.filterByType(DataEvent.TYPE_CHANGED));
-
-
-// -------------------------
         io.reactivex.Observable<DataMap> oml = io.reactivex.Observable.concat(ol,ml);
         subscription.add(oml.map(dataMap -> dataMap.get("latitude"))
-                .subscribe(   lat -> { lastValidLocation.setLatitude((Double)lat); updateDisplayedData(); Log.e(TAG, "got latitude");},
-                        throwable -> Toast.makeText(this, "Error on data listen for latitude", Toast.LENGTH_LONG))
-        );
+                .subscribe(   lat -> { lastValidLocation.setLatitude((Double)lat); updateDisplayedDataUpd(); Log.e(TAG, "got latitude");},
+                        throwable -> Log.d(TAG, "Error on data listen for latitude")));
+
         subscription.add(oml.map(dataMap -> dataMap.get("longitude"))
-                .subscribe(   longitude -> { lastValidLocation.setLongitude((Double)longitude);updateDisplayedData(); },
-                        throwable -> Toast.makeText(this, "Error on data listen for latitude", Toast.LENGTH_LONG))
-        );
+                .subscribe(   longitude -> { lastValidLocation.setLongitude((Double)longitude);updateDisplayedDataUpd(); Log.e(TAG, "got longitude");},
+                        throwable -> Log.d(TAG, "Error on data listen for longitude")));
         subscription.add(oml.map(dataMap -> dataMap.get("accuracy"))
-                .subscribe( accuracy -> { lastValidLocation.setAccuracy((float)accuracy);updateDisplayedData(); },
-                        throwable -> Toast.makeText(this, "Error on data listen for accuracy", Toast.LENGTH_LONG))
-        );
+                .subscribe( accuracy -> { lastValidLocation.setAccuracy((float)accuracy);updateDisplayedDataUpd(); Log.e(TAG, "got accuracy");},
+                        throwable -> Log.d(TAG, "Error on data listen for accuracy")));
+*/
+        // jako message
+        subscription.add(rxWear.message().listen("/location", MessageApi.FILTER_LITERAL)
+                .compose(MessageEventGetDataMap.noFilter())
+                .subscribe(dataMap -> {
+
+
+                    Boolean n = false;
+
+                    Double lat = dataMap.getDouble("latitude");
+                    if( lat != 0.0) {
+                        lastValidLocation.setLatitude(lat);
+                        n=true;
+                    }
+
+                    Double lon = dataMap.getDouble("longitude");
+                    if( lon != 0.0) {
+                        lastValidLocation.setLongitude(lon);
+                        n=true;
+                    }
+
+                    Float acc = dataMap.getFloat("accuracy");
+                    if( acc != 0.0) {
+                        lastValidLocation.setAccuracy(acc);
+                        n=true;
+                    }
+
+                    if(!n)
+                        isLastValid = false;
+                    else
+                        isLastValid = true;
+
+                    updateDisplayedDataUpd();
+                    Log.d(TAG, "got /location as message");
+                }, throwable -> Log.d(TAG, "Error on message listen for /location")));
 
     }
 
+    private void updateDisplayedDataUpd() {
+        lastValidLocationRcvDate.setToNow();
+        //updateDisplayedData();
+    }
 
     private void updateDisplayedData(){
 
@@ -147,7 +207,28 @@ public class MainActivity extends WearableActivity {
         }
 
         if(lastValidLocation!= null){
-            mTextSetDistance.setText(lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
+            Time t = new Time();
+            t.setToNow();
+            long d = (t.toMillis(false) - lastValidLocationRcvDate.toMillis(false)) / 1000;
+
+            boolean[] e = {false};
+            String mru ="";
+            rxWear.checkConnection().subscribe(() -> {
+                e[0] = true;
+            }, throwable -> {
+                // handle error
+                e[0] = false;
+            });
+
+            if(e[0] == false){
+                mru = "E";
+            }
+
+            String isLastValidStr = "";
+            if(!isLastValid)
+                isLastValidStr = "H";
+                    //.doOnComplete(()->{e[0]="e";});
+            mTextSetDistance.setText(mru + isLastValidStr + d + "[s]" + lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
         }
 
 

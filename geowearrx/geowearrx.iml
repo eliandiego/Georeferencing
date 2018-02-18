@@ -135,6 +135,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-license-11.8.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-26.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.greenrobot:eventbus:3.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:wear-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-wearable-11.8.0" level="project" />
     <orderEntry type="library" name="Gradle: com.patloew.rxwear:rxwear2-2.0.0" level="project" />
