@@ -3,7 +3,10 @@ package com.patloew.georeferencingsample;
 import static butterknife.ButterKnife.findById;
 
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.wearable.activity.WearableActivity;
@@ -32,6 +35,8 @@ import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Bind;
+
 import io.reactivex.disposables.CompositeDisposable;
 import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
@@ -47,6 +52,13 @@ public class MainActivity extends WearableActivity {
     private TextView mPersistentText;
     private TextView mText2;
     private TextView mTextSetDistance;
+
+    private int currentPointNr = 0;
+    private int numOfPoints = 0;
+
+    @Bind(R.id.textViewBattery) TextView battery;
+
+
     // 1.3
     //private CompositeSubscription subscription = new CompositeSubscription();
     private CompositeDisposable subscription = new CompositeDisposable();
@@ -106,6 +118,7 @@ public class MainActivity extends WearableActivity {
 
         // 1.3
 // to message // mee... (z rxLocation)
+        /*
         subscription.add(rxWear.message().listen("/message", MessageApi.FILTER_LITERAL)
                 .compose(MessageEventGetDataMap.noFilter())
                 .subscribe(dataMap -> {
@@ -113,7 +126,7 @@ public class MainActivity extends WearableActivity {
                     mMessageText.setText(dataMap.getString("message", getString(R.string.no_message_info)));
                     Log.d(TAG, "got /message");
                 }, throwable -> Log.d(TAG, "Error on message listen for /message")));
-
+*/
 /*
         subscription.add(
                 Observable.concat(
@@ -125,6 +138,7 @@ public class MainActivity extends WearableActivity {
         );
 */
 // data w formie stringu lat/long (nie z rxLocation)
+        /*
         io.reactivex.Observable<DataMap> o = rxWear.data().get("/persistentText").compose(DataItemGetDataMap.noFilter());
 
         io.reactivex.Observable<DataMap> m = rxWear.data().listen("/persistentText", DataApi.FILTER_LITERAL).
@@ -133,8 +147,43 @@ public class MainActivity extends WearableActivity {
         subscription.add(om.map(dataMap -> dataMap.get("text"))
                 .subscribe(   text -> {mPersistentText.setText((String)text); mText2.setText((String)text); Log.e(TAG, "got persistentText");},
                         throwable -> Log.d(TAG, "Error on data listen for persistenttext")));
+*/
 
+        /* // nie najlepiej gubi...
+        io.reactivex.Observable<DataMap> o = rxWear.data().get("/points").compose(DataItemGetDataMap.noFilter());
+        io.reactivex.Observable<DataMap> m = rxWear.data().listen("/points", DataApi.FILTER_LITERAL).
+                compose(DataEventGetDataMap.filterByType(DataEvent.TYPE_CHANGED));
+        io.reactivex.Observable<DataMap> om = io.reactivex.Observable.concat(o,m);
+        subscription.add(om.map(dataMap -> dataMap.get("pointsNum"))
+                .subscribe(   text -> {mPersistentText.setText("num="+text); Log.e(TAG, "got points num");},
+                        throwable -> Log.d(TAG, "Error on data listen for persistenttext")));
+*/
 
+       rxWear.data().listen("/points", DataApi.FILTER_LITERAL).
+                compose(DataEventGetDataMap.filterByType(DataEvent.TYPE_CHANGED))
+                .subscribe(   dataMap -> {
+                    if(dataMap.containsKey("pointsNum")) {
+                        int i = dataMap.getInt("pointsNum");
+                        numOfPoints = i;
+                        mPersistentText.setText("sel=" + currentPointNr + "/num=" + i);
+                        Log.e(TAG, "got points num");
+                    }
+                    if(dataMap.containsKey("selectedlatitude")) {
+                         Double f = dataMap.getDouble("selectedlatitude");
+                        mMessageText.setText("selected lat=" + f);
+                        Log.e(TAG, "selected lat=" + f);
+                    }
+                    if(dataMap.containsKey("selectedlongitude")) {
+                        Double f = dataMap.getDouble("selectedlongitude");
+                        Log.e(TAG, "selected lon=" + f);
+                    }
+                    if(dataMap.containsKey("selectedaccuracy")) {
+                                Float f = dataMap.getFloat("selectedaccuracy");
+                                Log.e(TAG, "selected acc=" + f);
+
+                    }
+                    },
+                        throwable -> Log.d(TAG, "Error on data listen for persistenttext"));
 
         // ------------------------- location
         // jako data (zle dziala)
@@ -199,12 +248,9 @@ public class MainActivity extends WearableActivity {
 
     private void updateDisplayedData(){
 
+        battery.setText("b:" + getBatteryLevel() + "b");
 
-        String text = "";
-        if(pinLocation != null) {
-            float dist = lastValidLocation.distanceTo(pinLocation);
-            float dir = lastValidLocation.bearingTo(pinLocation);
-        }
+
 
         if(lastValidLocation!= null){
             Time t = new Time();
@@ -228,10 +274,34 @@ public class MainActivity extends WearableActivity {
             if(!isLastValid)
                 isLastValidStr = "H";
                     //.doOnComplete(()->{e[0]="e";});
-            mTextSetDistance.setText(mru + isLastValidStr + d + "[s]" + lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
+            mTitleText.setText(mru + isLastValidStr + d + "[s]" + lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
+        }
+
+        String text = "";
+        if(pinLocation != null) {
+            float dist = lastValidLocation.distanceTo(pinLocation);
+            float dir = lastValidLocation.bearingTo(pinLocation);
+            mTextSetDistance.setText(pinLocation.getLatitude() + "  " + dist + " dir=" + dir);
         }
 
 
+
+    }
+
+    public String getBatteryLevel() {
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+// Error checking that probably isn't needed but I added just in case.
+        if(level == -1 || scale == -1) {
+            return "error";
+        }
+
+
+        float batteryLevelWithDecimals = ((float)level / (float)scale) * 100.0f;
+        String battery = String.format("%.0f", batteryLevelWithDecimals);
+        return battery ;
     }
 
     @Override
@@ -276,7 +346,27 @@ public class MainActivity extends WearableActivity {
         */
     }
 
-    void sendTheCurrentPointsToWear(){
+    void sendGiveLocationForSelectedPointToWear(){
+        sendToMobileIntegerData("/points", "giveSelectedPoint", currentPointNr);
+    }
+
+    public void sendToMobileIntegerData(String path, String topic, int value){
+        Log.e("MyService", "sendToMobileIntegerData:" + value );
+        rxWear.data().putDataMap().urgent().to(path).putInt(topic, value).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending (Data) data", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
     }
 
@@ -305,15 +395,23 @@ public class MainActivity extends WearableActivity {
     @OnClick(R.id.buttonMS)
     public void submit(View view) {
         Log.i(TAG, "klikneli mnie!");
-        sendToMobile("baba", "zaba");
+        //sendToMobile("baba", "zaba");
 
+        if(currentPointNr < numOfPoints-1)
+            currentPointNr++;
+        else
+            currentPointNr= 0;
+
+        mPersistentText.setText("sel=" + currentPointNr + "/num=" + numOfPoints);
+        sendGiveLocationForSelectedPointToWear();
     }
 
     @OnClick(R.id.buttonSetDist)
     public void measureDistance(View view) {
         Log.i(TAG, "klikneli mnie!");
 
-        pinLocation = lastValidLocation;
+        //pinLocation = lastValidLocation;
+        pinLocation = new Location(lastValidLocation);
 
     }
 

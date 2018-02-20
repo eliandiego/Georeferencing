@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.patloew.georeferencingsample.R;
@@ -24,6 +26,7 @@ import com.patloew.georeferencingsample.event.SimpleEvent;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.rxwear.GoogleAPIConnectionException;
 import com.patloew.rxwear.RxWear;
+import com.patloew.rxwear.transformers.DataEventGetDataMap;
 import com.patloew.rxwear.transformers.MessageEventGetDataMap;
 
 import org.greenrobot.eventbus.EventBus;
@@ -171,6 +174,22 @@ public class MyService extends Service {
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
+
+        //
+        rxWear.data().listen("/points", DataApi.FILTER_LITERAL).
+                compose(DataEventGetDataMap.filterByType(DataEvent.TYPE_CHANGED))
+                .subscribe(   dataMap -> {
+                             Log.d(TAG, "cos przyszlo");
+
+                            if(dataMap.containsKey("giveSelectedPoint")) {
+
+                                Log.e(TAG, "asked about selected point");
+                                Location l = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().get(0).getLocation();
+                                sendToWearLocationData("/points", "selected", l);
+                            }
+                        },
+                        throwable -> Log.d(TAG, "Error on data listen for giveSelectedPoint"));
+
 
     }
 
@@ -348,10 +367,55 @@ public class MyService extends Service {
                         //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
                     }
                 });
+    }
 
+    static public void sendToWearPointsNumberData(int value){
+        sendToWearIntegerData("/points", "pointsNum", value);
+    }
+
+    static public void sendToWearIntegerData(String path, String topic, int value){
+        Log.e("MyService", "sendToWearIntegerData:" + value );
+        rxWear.data().putDataMap().urgent().to(path).putInt(topic, value).toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending (Data) data", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
     }
 
+    static public void sendToWearLocationData(String path, String topic, Location location){
+        Log.e("MyService", "sendToWearIntegerData:" + location.toString() );
+        rxWear.data().putDataMap().urgent().to(path)
+                .putDouble(topic+"latitude", location.getLatitude())
+                .putDouble(topic+"longitude", location.getLongitude())
+                .putFloat(topic+"accuracy", location.getAccuracy())
+                .toObservable().subscribe(requestId -> //Snackbar.make(coordinatorLayout, "Sent message", Snackbar.LENGTH_LONG).show()
+                {
+                },
+                // ,
+                throwable -> {
+                    Log.e("MainActivity", "Error on sending (Data) data", throwable);
+
+                    if (throwable instanceof GoogleAPIConnectionException) {
+                        //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Android Wear app is not installed", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        //            Toast.makeText(getApplicationContext(), "Could not send message", Toast.LENGTH_LONG).show();
+                        //Snackbar.make(coordinatorLayout, "Could not send message", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+    }
 
     static private void sendToWearFloatMessage(String path, String topic, float value){
 
@@ -376,6 +440,9 @@ public class MyService extends Service {
 
 
     }
+
+
+
     static private void sendToWearLocation(Location l){
 
         DataMap dm = new DataMap();
@@ -456,21 +523,7 @@ public class MyService extends Service {
 
 
 
-    public String getBatteryLevel() {
-        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-// Error checking that probably isn't needed but I added just in case.
-        if(level == -1 || scale == -1) {
-            return "error";
-        }
-
-
-        float batteryLevelWithDecimals = ((float)level / (float)scale) * 100.0f;
-        String battery = String.format("%.0f", batteryLevelWithDecimals);
-        return battery ;
-    }
 
 
 

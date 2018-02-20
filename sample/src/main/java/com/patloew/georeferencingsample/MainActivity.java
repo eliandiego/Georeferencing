@@ -878,6 +878,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
             }
 
 
+
+
         });
 
 
@@ -931,6 +933,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
                                                 GeoLocation.Repozytorium.getLocationPositions().remove(nr);
                                                 geoAdapter.notifyDataSetInvalidated();
                                                 geoAdapter.notifyDataSetChanged();
+
+                                                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+                                                MyService.sendToWearPointsNumberData(numOfPoints);
 
                                             }
                                         }
@@ -1039,6 +1044,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 GeoLocation.Repozytorium.writePositionsToFile();
                 String s = GeoLocation.Repozytorium.readFromFile();
                 mackotext.setText("dd" + s);
+
+                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+                MyService.sendToWearPointsNumberData(numOfPoints);
+
+
+
+
 
             }
         });
