@@ -1,6 +1,7 @@
 package com.patloew.georeferencingsample;
 
 
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
@@ -55,6 +57,8 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
 import com.nononsenseapps.filepicker.AbstractFilePickerFragment;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.nononsenseapps.filepicker.Utils;
+
+import com.patloew.georeferencingsample.databinding.ActivityMainMobileBinding;
 import com.patloew.georeferencingsample.event.SimpleEvent;
 import com.patloew.georeferencingsample.service.MyService;
 import com.patloew.rxlocation.RxLocation;
@@ -63,6 +67,7 @@ import com.patloew.georeferencingsample.data.DataFactory;
 import com.patloew.georeferencingsample.geoData.CalculateDistancesKt;
 
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.codecrafters.tableview.listeners.OnScrollListener;
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
@@ -100,6 +105,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+
+
+
 //import droidninja.filepicker.FilePickerConst;
 
 
@@ -129,6 +140,9 @@ import java.util.concurrent.TimeUnit;
 // ale sie zatrzymuje przy wygaszeniu ekranu na telefonie? - aktualizacja pozycji?
 public class MainActivity extends AppCompatActivity implements MainView,
         MessageClient.OnMessageReceivedListener {
+
+    ActivityMainMobileBinding binding;
+
 
     @Override
     public void onMessageReceived(@NonNull MessageEvent messageEvent) {
@@ -171,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private CustomMapView customMapView = null;
 
     private RxLocation rxLocation;
+
+    private TextView tvKmToCm = null;
 
     private RadioButton radioButtonPositionSource_gps = null;
     private RadioButton radioButtonPositionSource_distance = null;
@@ -501,6 +517,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
+    public static Intent createIntent(Context context) {
+        return new Intent(context, MainActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -508,9 +527,14 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
 
-        setContentView(R.layout.activity_main);
 
-        //rxWear = new RxWear(this);
+        setContentView(R.layout.activity_main_mobile);
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main_mobile);
+
+        //binding.textViewKmToCm.setText("mru");
+        //binding.textViewCmToKm.setText("mru");
+                //rxWear = new RxWear(this);
 
 
         //Wearable.getMessageClient(this).addListener(this);
@@ -640,7 +664,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonLoad = findViewById(R.id.buttonLoad);
 
 
-
+        tvKmToCm = findViewById(R.id.textViewKmToCm);
 
 
 
@@ -834,7 +858,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                binding.textViewCmToKm.setText("Ha!");
             }
         });
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
@@ -910,7 +934,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 // You could specify a String like "/storage/emulated/0/", but that can
                 // dangerous. Always use Android's API calls to get paths to the SD-card or
                 // internal memory.
-                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+                //i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH,getFilesDir().getAbsolutePath() + "/manewry");
+
 
                 startActivityForResult(i, FILE_CODE_READ);
 
@@ -1033,6 +1059,14 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 Log.d("SSR", "odleglosci");
                 CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
                 Log.d("SSR", "lampiony obliczone");
+
+
+                binding.textViewCmToKm.setText("Hel" + odl);
+                binding.textViewKmToCm.setText("" + 1000.0 / odl);
+                //tvKmToCm.setText("Ho" + odl);
+
+
+                //@BindView(R.id.textViewCmToKm) TextView button1;
 
                 // geoTableView. - redraw?
                 geoAdapter.notifyDataSetInvalidated();

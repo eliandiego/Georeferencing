@@ -33,9 +33,10 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.Date;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Bind;
+//import butterknife.Bind;
 
 import io.reactivex.disposables.CompositeDisposable;
 import rx.Observable;
@@ -56,7 +57,7 @@ public class MainActivity extends WearableActivity {
     private int currentPointNr = 0;
     private int numOfPoints = 0;
 
-    @Bind(R.id.textViewBattery) TextView battery;
+    @BindView(R.id.textViewBattery) TextView battery;
 
 
     // 1.3
@@ -69,6 +70,7 @@ public class MainActivity extends WearableActivity {
     private Boolean isLastValid = false;
     private Time lastValidLocationRcvDate = new Time();
     private Location pinLocation = null;
+    private Location targetLocation = new Location("");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,15 +172,18 @@ public class MainActivity extends WearableActivity {
                     }
                     if(dataMap.containsKey("selectedlatitude")) {
                          Double f = dataMap.getDouble("selectedlatitude");
-                        mMessageText.setText("selected lat=" + f);
+                        //mMessageText.setText("selected lat=" + f);
+                        targetLocation.setLatitude(f);
                         Log.e(TAG, "selected lat=" + f);
                     }
                     if(dataMap.containsKey("selectedlongitude")) {
                         Double f = dataMap.getDouble("selectedlongitude");
+                        targetLocation.setLongitude(f);
                         Log.e(TAG, "selected lon=" + f);
                     }
                     if(dataMap.containsKey("selectedaccuracy")) {
                                 Float f = dataMap.getFloat("selectedaccuracy");
+                                targetLocation.setAccuracy(f);
                                 Log.e(TAG, "selected acc=" + f);
 
                     }
@@ -281,9 +286,14 @@ public class MainActivity extends WearableActivity {
         if(pinLocation != null) {
             float dist = lastValidLocation.distanceTo(pinLocation);
             float dir = lastValidLocation.bearingTo(pinLocation);
-            mTextSetDistance.setText(pinLocation.getLatitude() + "  " + dist + " dir=" + dir);
+            mTextSetDistance.setText("pin:"+ " dist=" + dist + " dir=" + dir + pinLocation.getLatitude() );
         }
 
+        if(targetLocation != null) {
+            float dist = lastValidLocation.distanceTo(targetLocation);
+            float dir = lastValidLocation.bearingTo(targetLocation);
+            mMessageText.setText("target:"+ " dist=" + dist + " dir=" + dir + targetLocation.getLatitude() );
+        }
 
 
     }
@@ -402,7 +412,7 @@ public class MainActivity extends WearableActivity {
         else
             currentPointNr= 0;
 
-        mPersistentText.setText("sel=" + currentPointNr + "/num=" + numOfPoints);
+        mPersistentText.setText("sel=" + currentPointNr + "/0-" + (numOfPoints-1));
         sendGiveLocationForSelectedPointToWear();
     }
 

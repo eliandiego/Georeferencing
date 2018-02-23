@@ -182,9 +182,9 @@ public class MyService extends Service {
                              Log.d(TAG, "cos przyszlo");
 
                             if(dataMap.containsKey("giveSelectedPoint")) {
-
-                                Log.e(TAG, "asked about selected point");
-                                Location l = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().get(0).getLocation();
+                                int i = dataMap.getInt("giveSelectedPoint");
+                                Log.e(TAG, "asked about selected point: " + i );
+                                Location l = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().get(i).getLocation();
                                 sendToWearLocationData("/points", "selected", l);
                             }
                         },
