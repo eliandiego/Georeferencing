@@ -4,12 +4,14 @@ package com.patloew.georeferencingsample.geoData
 
 import android.location.Location
 import android.os.Environment
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import java.io.FileReader
 import java.io.PrintWriter
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.google.maps.android.SphericalUtil
 
 /**
  * Created by maciek on 11/29/17.
@@ -28,7 +30,8 @@ data class GeoLocation (var location: Location?,
 
     //private var typ: PointType = PointType.LAMPION;
 
-
+    //constructor(var location1: Location?, val distance1: Double, var location2: Location?, val distance2: Double){
+    //}
 
 
     init {
@@ -105,6 +108,43 @@ data class GeoLocation (var location: Location?,
             return addNewPointToRepo(nowa)
         }
 
+        fun computeAngle(a : Double, b : Double, c: Double) : Double {
+            val m = (c*c - a*a - b*b)/(-2.0*a*b);
+            val mm = Math.acos(m) * 180/Math.PI;
+            return mm;
+        }
+
+        fun addNewOsnowaPointWithValidPosFromMarker(relativeToNr1: Int, len1: Double, relativeToNr2: Int, len2: Double, odl: Double) : Unit{
+
+            val l1: GeoLocation? = Repozytorium.locationPositions[relativeToNr1];
+            val l2: GeoLocation? = Repozytorium.locationPositions[relativeToNr2];
+
+            val dist = l1!!.location!!.distanceTo(l2!!.location);
+            val dir = l1!!.location!!.bearingTo(l2!!.location);
+
+
+            println("odl=" + odl);
+            val odlNaMapie = odl * dist;
+            println("dist=" + dist + " odlNaMapie=" + odlNaMapie);
+
+            val angle = computeAngle(len1, odlNaMapie, len2)
+            println("angle=" + angle);
+
+
+            val l: LatLng = SphericalUtil.computeOffset(LatLng(l1!!.location!!.latitude, l1!!.location!!.longitude), len1*1000.0/(odl*1000.0), dir+angle);
+            //val l: Location = l1.location.
+
+            var lok = Location("")
+
+            lok.longitude = l.longitude;
+            lok.latitude = l.latitude;
+
+            val nowa = GeoLocation(lok, 0.0, 0.0, true, 0, relativeToNr1, PointType.LAMPION_OFF);
+            addNewPointToRepo(nowa)
+
+            //val nowa = GeoLocation(loc, offsetX, offsetY, true, 0, relativeToNr, PointType.OSNOWA_MARKER);
+            //return addNewPointToRepo(nowa)
+        }
 
 
         fun getMutableMapFromJsonLocationPositions(g: Gson, text: String) : MutableMap<Int, GeoLocation> {

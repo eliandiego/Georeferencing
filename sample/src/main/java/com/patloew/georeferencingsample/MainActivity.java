@@ -858,7 +858,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                binding.textViewCmToKm.setText("Ha!");
+                //binding.textViewCmToKm.setText("Ha!");
+// 4.3, 3.4 - czd
+
+                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+                GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(0, 8.65, 1, 9.25, 1.0/odl);
+                redrawTable();
             }
         });
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
