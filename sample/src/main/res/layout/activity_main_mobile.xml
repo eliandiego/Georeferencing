@@ -336,7 +336,7 @@
                     android:ems="10"
                     android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
                     android:numeric="integer|signed|decimal"
-                    android:text="0.0" />
+                    android:text="" />
 
                 <TextView
                     android:layout_width="21dp"
@@ -352,7 +352,7 @@
                     android:ems="10"
                     android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
                     android:numeric="signed|decimal"
-                    android:text="0.0" />
+                    android:text="" />
 
             </LinearLayout>
 
@@ -389,7 +389,7 @@
                     android:layout_width="21dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="1 cm = [km]" />
+                    android:text="1 cm = [m]" />
 
                 <EditText
                     android:id="@+id/textViewCmToKm"

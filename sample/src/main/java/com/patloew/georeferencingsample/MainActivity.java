@@ -74,6 +74,7 @@ import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import droidninja.filepicker.FilePickerBuilder;
+import kotlin.Pair;
 import rx.subscriptions.CompositeSubscription;
 //import com.jakewharton.rxbinding.view.RxView;
 //import rx.Observable;
@@ -108,7 +109,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
+import static com.patloew.georeferencingsample.mapsHelpers.SizeHelperKt.getBoundingRect;
 
 
 //import droidninja.filepicker.FilePickerConst;
@@ -858,6 +859,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+
+
                 //binding.textViewCmToKm.setText("Ha!");
 // 4.3, 3.4 - czd
 
@@ -871,6 +876,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
             public void onClick(View v) {
 
                 DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+
 
             }
 
@@ -1060,14 +1066,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 } //else if(rad)
 */
 
-                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
-                Log.d("SSR", "odleglosci");
-                CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
-                Log.d("SSR", "lampiony obliczone");
+                calculateAndShowDistances();
 
-
-                binding.textViewCmToKm.setText("Hel" + odl);
-                binding.textViewKmToCm.setText("" + 1000.0 / odl);
                 //tvKmToCm.setText("Ho" + odl);
 
 
@@ -1088,6 +1088,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 MyService.sendToWearPointsNumberData(numOfPoints);
 
 
+                DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
 
 
 
@@ -1099,6 +1100,27 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
+
+    protected void calculateAndShowDistances(){
+        Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+        Log.d("SSR", "odleglosci");
+        CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
+        Log.d("SSR", "lampiony obliczone");
+
+
+        binding.textViewCmToKm.setText("" + odl);
+        binding.textViewKmToCm.setText("" + 1000.0 / odl);
+
+    }
+
+    protected void moveMapTo(Pair<Location, Location> pair){
+        LatLng l = new LatLng(pair.getFirst().getLatitude(), pair.getFirst().getLongitude());
+
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(52.1, -21.9));
+        mapaGooglowa.moveCamera(CameraUpdateFactory.newLatLng(l));
+        //googleMap.setZ
+        mapaGooglowa.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
+    }
 
     // onCreate end
 
@@ -1209,6 +1231,15 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                 if (FILE_CODE_READ == requestCode) {
                     deserializeFromFile(f);
+
+                    calculateAndShowDistances();
+
+                    Pair<Location,Location> m = getBoundingRect(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions());
+
+                    moveMapTo(m);
+
+                    DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+
                 } else if (FILE_CODE_WRITE == requestCode) {
 
                     String data2 = "bobo";
