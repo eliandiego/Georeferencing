@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -60,6 +61,7 @@ import com.nononsenseapps.filepicker.Utils;
 
 import com.patloew.georeferencingsample.databinding.ActivityMainMobileBinding;
 import com.patloew.georeferencingsample.event.SimpleEvent;
+import com.patloew.georeferencingsample.geoData.PointType;
 import com.patloew.georeferencingsample.service.MyService;
 import com.patloew.rxlocation.RxLocation;
 import com.patloew.georeferencingsample.data.DataFactory;
@@ -402,6 +404,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
         return text;
     }
 
+    private void updateAfterChangeNrOfPoints(){
+        calculateAndShowDistances();
+        redrawTable();
+        fillSpinnersWithPoints();
+
+    }
+
     private void redrawTable() {
         geoTableView.invalidate();
         geoTableView.refreshDrawableState();
@@ -443,7 +452,55 @@ public class MainActivity extends AppCompatActivity implements MainView,
             Toast.makeText(MainActivity.this, "can read from file", Toast.LENGTH_SHORT).show();
         }
         Toast.makeText(MainActivity.this, "data updated, size of table=" + GeoLocation.Repozytorium.getPositionsUser().size(), Toast.LENGTH_LONG).show();
-        redrawTable();
+
+        updateAfterChangeNrOfPoints();
+
+    }
+
+    private void fillSpinnersWithPoints(){
+
+        List<String> categories = new ArrayList<String>();
+
+        String selectedPos11 = "";
+        if(binding.spinner11.isSelected())
+            selectedPos11 = binding.spinner11.getSelectedItem().toString();
+        String selectedPos21 = "";
+        if(binding.spinner21.isSelected())
+            selectedPos21 = binding.spinner21.getSelectedItem().toString();
+        String selectedPos22 = "";
+        if(binding.spinner22.isSelected())
+            selectedPos22 = binding.spinner22.getSelectedItem().toString();
+
+        for(GeoLocation o :
+            com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().values()){
+            String s = "" + o.getNum();
+            if(o.getType() == PointType.OSNOWA_GPS || o.getType() == PointType.OSNOWA_MARKER)
+                s += " OSN";
+            categories.add(s);
+        }
+
+        //categories.add("Automobile");
+        //categories.add("Business Services");
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+
+        binding.spinner11.setAdapter(dataAdapter);
+        binding.spinner21.setAdapter(dataAdapter);
+        binding.spinner22.setAdapter(dataAdapter);
+
+        if(categories.contains(selectedPos11)) {
+            int i = dataAdapter.getPosition(selectedPos11);
+            binding.spinner11.setSelection(i);
+        }
+        if(categories.contains(selectedPos21)) {
+            int i = dataAdapter.getPosition(selectedPos21);
+            binding.spinner21.setSelection(i);
+        }
+        if(categories.contains(selectedPos22)) {
+            int i = dataAdapter.getPosition(selectedPos22);
+            binding.spinner22.setSelection(i);
+        }
+
     }
 
     private void deserializeFromFile() {
@@ -464,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
         Toast.makeText(MainActivity.this, "data updated, size of table=" + GeoLocation.Repozytorium.getPositionsUser().size(), Toast.LENGTH_LONG).show();
 
-        redrawTable();
+        updateAfterChangeNrOfPoints();
         //geoAdapter.notifyDataSetInvalidated();
         //geoAdapter.notifyDataSetChanged();
 
@@ -694,6 +751,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
         //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
         //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
 
+
+        binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
+        binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
+        binding.radioButtonOsnowa.setChecked(true);
+        binding.radioButtonOsnowaMarker.setChecked(true);
+
         checkBoxKeepScreenAlive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // update your model (or other business logic) based on isChecked
@@ -758,13 +821,80 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
 
 
+        binding.radioButtonLampion.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.RadioGrupaLampiony.setVisibility(View.VISIBLE);
+                        binding.RadioGrupaOsnowa.setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
+
+        binding.radioButtonOsnowa.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.RadioGrupaLampiony.setVisibility(View.INVISIBLE);
+                        binding.RadioGrupaOsnowa.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
+
+
+        binding.radioButtonOsnowaOdl.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
+                        binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
+                        binding.offsetYG1.setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
+
+        binding.radioButtonOsnowaXy.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
+                        binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
+                        binding.offsetYG1.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
+
+        binding.radioButtonLampionXy.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
+                        binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
+                        binding.offsetYG1.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
+
+        binding.radioButtonLampionOdl.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        binding.Grupa1Wartosc.setVisibility(View.INVISIBLE);
+                        binding.Grupa2Wartosci.setVisibility(View.VISIBLE);
+//                        binding.offsetYG1.setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
+
         radioGroupOsnowaLampion.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (radioButtonPositionType_osnowa.isChecked())
+                if (radioButtonPositionType_osnowa.isChecked()) {
                     radioButtonPositionSource_distance.setText("Marker");
-                else
+                    binding.RadioGrupaLampiony.setVisibility(View.INVISIBLE);
+                }else {
                     radioButtonPositionSource_distance.setText("distance");
+                }
             }
         });
 
@@ -837,9 +967,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
         radioButtonPositionType_osnowa.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus)
+                if (hasFocus) {
                     radioButtonPositionSource_distance.setText("Marker");
-                else
+                    binding.RadioGrupaLampiony.setVisibility(View.INVISIBLE);
+                }else
                     radioButtonPositionSource_distance.setText("distance");
             }
         });
@@ -860,15 +991,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
             @Override
             public void onClick(View v) {
 
-
-
-
-                //binding.textViewCmToKm.setText("Ha!");
-// 4.3, 3.4 - czd
-
-                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
-                GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(0, 8.65, 1, 9.25, 1.0/odl);
-                redrawTable();
             }
         });
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
@@ -981,77 +1103,162 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonAddPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("SSR", "blebe");
-                Location l = new Location("");
+                //addPointOldApproach();
+                addPointNewApproach();
+            }
 
-                //
 
-                Double offX = Double.parseDouble(offsetX.getText().toString());
-                Double offY = Double.parseDouble(offsetY.getText().toString());
+        });
 
-                int refPointNr = 0;
-                if (!radioGroupReferenceToZeroPoint.isChecked()) {
-                    String s = editTextReferenceToPointNr.getText().toString();
-                    try {
-                        refPointNr = Integer.parseInt(s);
-                    } catch (Exception e) {
-                        refPointNr = 0;
-                    }
+        startService(new Intent(this, MyService.class)); // ok ale zwraca null w service
+        //startService(new Intent(getApplicationContext(), MyService.class));
+
+    }
+
+
+    private void addPointNewApproach(){
+
+        Location l = new Location("");
+
+        //
+
+        boolean singleXYset = true;
+        boolean twoOdl = true;
+        Double offX = 0.0;
+        Double offY = 0.0;
+
+        Double offX21 = 0.0;
+        Double offX22 = 0.0;
+
+        try {
+            offX = Double.parseDouble(binding.offsetX.getText().toString());
+            offY = Double.parseDouble(binding.offsetY.getText().toString());
+        } catch(Exception e) {
+            singleXYset = false;
+
+        }
+        try{
+            offX21 = Double.parseDouble(binding.wartoscG21.getText().toString());
+            offX22 = Double.parseDouble(binding.wartoscG22.getText().toString());
+        } catch (Exception e) {
+            twoOdl = false;
+        }
+
+        int ref22 = 0;
+        int ref21 = 0;
+        int ref1 = 0;
+        if(binding.spinner11.isSelected()){
+            String s= binding.spinner11.getSelectedItem().toString();
+            ref1 = (int)binding.spinner11.getSelectedItemId();
+        }
+        if(binding.spinner21.isSelected()){
+
+            ref21 = (int)binding.spinner21.getSelectedItemId();
+        }
+        if(binding.spinner22.isSelected()){
+
+            ref22 = (int)binding.spinner22.getSelectedItemId();
+        }
+        ref22 = (int)binding.spinner22.getSelectedItemId();
+
+
+        if(binding.radioButtonOsnowa.isChecked()){
+
+            if(binding.radioButtonOsnowaXy.isChecked()){
+
+            } else if(binding.radioButtonLampionOdl.isChecked()){
+
+            } else if(binding.radioButtonOsnowaMarker.isChecked()){
+
+            }
+
+        } else if(binding.radioButtonLampion.isChecked()){
+            if(binding.radioButtonLampionOdl.isChecked() && twoOdl){
+
+                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+                GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(ref21, offX21, ref22, offX22, 1.0/odl);
+
+            } else if(binding.radioButtonLampionXy.isChecked()){
+
+            }// else if(binding.)
+        }
+
+        updateAfterChangeNrOfPoints();
+
+    }
+
+    private void addPointOldApproach(){
+        Log.d("SSR", "blebe");
+        Location l = new Location("");
+
+        //
+
+        Double offX = Double.parseDouble(offsetX.getText().toString());
+        Double offY = Double.parseDouble(offsetY.getText().toString());
+
+        int refPointNr = 0;
+        if (!radioGroupReferenceToZeroPoint.isChecked()) {
+            String s = editTextReferenceToPointNr.getText().toString();
+            try {
+                refPointNr = Integer.parseInt(s);
+            } catch (Exception e) {
+                refPointNr = 0;
+            }
+        }
+
+        if (radioButtonPositionType_osnowa.isChecked()) {
+
+            if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
+                Toast.makeText(getBaseContext(), "both offs can be 0.0 for osnowa!", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+
+            if (radioButtonPositionSource_gps.isChecked()) {
+
+                // gps
+
+                //rxLocation.
+
+                //if(msLastLocation.)
+                l.setLatitude(msLastLocation.getLatitude());
+                l.setLongitude(msLastLocation.getLongitude());
+
+                //l.setLa
+                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromGPS(l, refPointNr, offX, offY);
+
+
+            } else if (radioButtonPositionSource_distance.isChecked()) {
+
+                if (currentMarker == null) {
+                    Toast.makeText(getBaseContext(), "no marker!", Toast.LENGTH_LONG).show();
+                    return;
                 }
 
-                if (radioButtonPositionType_osnowa.isChecked()) {
+                // marker
+                l.setLatitude(currentMarker.getPosition().latitude);
+                l.setLongitude(currentMarker.getPosition().longitude);
+                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(l, refPointNr, offX, offY);
 
-                    if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
-                        Toast.makeText(getBaseContext(), "both offs can be 0.0 for osnowa!", Toast.LENGTH_LONG).show();
-                        return;
-                    }
+            }
 
-
-                    if (radioButtonPositionSource_gps.isChecked()) {
-
-                        // gps
-
-                        //rxLocation.
-
-                        //if(msLastLocation.)
-                        l.setLatitude(msLastLocation.getLatitude());
-                        l.setLongitude(msLastLocation.getLongitude());
-
-                        //l.setLa
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromGPS(l, refPointNr, offX, offY);
+        } else if (radioButtonPositionType_lampion.isChecked()) {
+            // lampion
 
 
-                    } else if (radioButtonPositionSource_distance.isChecked()) {
-
-                        if (currentMarker == null) {
-                            Toast.makeText(getBaseContext(), "no marker!", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        // marker
-                        l.setLatitude(currentMarker.getPosition().latitude);
-                        l.setLongitude(currentMarker.getPosition().longitude);
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(l, refPointNr, offX, offY);
-
-                    }
-
-                } else if (radioButtonPositionType_lampion.isChecked()) {
-                    // lampion
+            if (radioButtonPositionSource_gps.isChecked()) {
 
 
-                    if (radioButtonPositionSource_gps.isChecked()) {
+            } else if (radioButtonPositionSource_distance.isChecked()) {
 
-
-                    } else if (radioButtonPositionSource_distance.isChecked()) {
-
-                        if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
-                            Toast.makeText(getBaseContext(), "both offs can be 0.0 for lampion!", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint(refPointNr, offX, offY);
-                    }
+                if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
+                    Toast.makeText(getBaseContext(), "both offs can be 0.0 for lampion!", Toast.LENGTH_LONG).show();
+                    return;
                 }
+
+                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint(refPointNr, offX, offY);
+            }
+        }
 
                 /*
                 if(radioButtonPositionSource_gps.isChecked()) {
@@ -1066,40 +1273,30 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 } //else if(rad)
 */
 
-                calculateAndShowDistances();
+        calculateAndShowDistances();
 
-                //tvKmToCm.setText("Ho" + odl);
-
-
-                //@BindView(R.id.textViewCmToKm) TextView button1;
-
-                // geoTableView. - redraw?
-                geoAdapter.notifyDataSetInvalidated();
-                geoAdapter.notifyDataSetChanged();
+        //tvKmToCm.setText("Ho" + odl);
 
 
-                //geoTableView.refreshDrawableState();
+        //@BindView(R.id.textViewCmToKm) TextView button1;
 
-                GeoLocation.Repozytorium.writePositionsToFile();
-                String s = GeoLocation.Repozytorium.readFromFile();
-                mackotext.setText("dd" + s);
-
-                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
-                MyService.sendToWearPointsNumberData(numOfPoints);
+        // geoTableView. - redraw?
+        geoAdapter.notifyDataSetInvalidated();
+        geoAdapter.notifyDataSetChanged();
 
 
-                DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+        //geoTableView.refreshDrawableState();
+
+        GeoLocation.Repozytorium.writePositionsToFile();
+        String s = GeoLocation.Repozytorium.readFromFile();
+        mackotext.setText("dd" + s);
+
+        int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+        MyService.sendToWearPointsNumberData(numOfPoints);
 
 
-
-            }
-        });
-
-        startService(new Intent(this, MyService.class)); // ok ale zwraca null w service
-        //startService(new Intent(getApplicationContext(), MyService.class));
-
+        DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
     }
-
 
     protected void calculateAndShowDistances(){
         Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());

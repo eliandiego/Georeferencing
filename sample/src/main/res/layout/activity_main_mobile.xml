@@ -161,6 +161,7 @@
             </LinearLayout>
 
             <RadioGroup
+                android:id="@+id/RadioGrupa_osnowa"
                 android:layout_width="558dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -169,7 +170,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton_osnowa_odl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="6dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="O: odl+Mar" />
@@ -177,21 +178,21 @@
 
                 <RadioButton
                     android:id="@+id/radioButton_osnowa_xy"
-                    android:layout_width="wrap_content"
+                    android:layout_width="6dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="O: x,y+Mar" />
 
                 <RadioButton
                     android:id="@+id/radioButton_osnowa_marker"
-                    android:layout_width="wrap_content"
+                    android:layout_width="1dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="O: mar" />
 
                 <RadioButton
                     android:id="@+id/radioButton_osnowa_gps"
-                    android:layout_width="31dp"
+                    android:layout_width="3dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="O: gps" />
@@ -208,7 +209,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton_lampion_odl"
-                    android:layout_width="wrap_content"
+                    android:layout_width="9dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="L: 2x odl+Mark" />
@@ -216,72 +217,131 @@
 
                 <RadioButton
                     android:id="@+id/radioButton_lampion_xy"
-                    android:layout_width="wrap_content"
+                    android:layout_width="15dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="L: x,y+mark" />
+                    android:width="2dp"
+                    android:maxWidth="3dp"
+                    android:text="L: x,y+mark"
+                    android:textSize="10sp" />
 
                 <RadioButton
                     android:id="@+id/radioButton_lampion_marker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="6dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="L: mark" />
 
                 <RadioButton
                     android:id="@+id/radioButton_lampion_gps"
-                    android:layout_width="31dp"
-                    android:layout_height="63dp"
+                    android:layout_width="11dp"
+                    android:layout_height="22dp"
                     android:layout_weight="1"
                     android:text="L: gps" />
 
             </RadioGroup>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:id="@+id/Grupa_1_wartosc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="x [cm]=" />
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/offsetX_G1"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
-                android:numeric="integer|signed|decimal"
-                android:text="" />
+                <Spinner
+                    android:id="@+id/spinner1_1"
+                    android:layout_width="107dp"
+                    android:layout_height="33dp"
+                    android:layout_weight="1"
+                    android:background="#3a3a3a" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="y [cm]=" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="x [cm]=" />
 
-            <EditText
-                android:id="@+id/offsetY_G1"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
+                <EditText
+                    android:id="@+id/offsetX_G1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
+                    android:numeric="integer|signed|decimal"
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="y [cm]=" />
+
+                <EditText
+                    android:id="@+id/offsetY_G1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
+                    android:numeric="integer|signed|decimal"
+                    android:text="" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Grupa_2_wartosci"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:ems="10"
-                android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
-                android:numeric="integer|signed|decimal"
-                android:text="" />
-        </LinearLayout>
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinner2_1"
+                    android:layout_width="91dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:background="?attr/colorPrimary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="x [cm]=" />
+
+                <EditText
+                    android:id="@+id/wartosc_G2_1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
+                    android:numeric="integer|signed|decimal"
+                    android:text="" />
+
+                <Spinner
+                    android:id="@+id/spinner2_2"
+                    android:layout_width="77dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="?attr/colorPrimary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="y [cm]=" />
+
+                <EditText
+                    android:id="@+id/wartosc_G2_2"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
+                    android:numeric="integer|signed|decimal"
+                    android:text="" />
+            </LinearLayout>
 
 
         <LinearLayout
