@@ -108,31 +108,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+//import butterknife.ButterKnife;
+//import butterknife.OnClick;
 
 import static com.patloew.georeferencingsample.mapsHelpers.SizeHelperKt.getBoundingRect;
 
 
-//import droidninja.filepicker.FilePickerConst;
-
-
-//import permissions.dispatcher.NeedsPermission;
-//import permissions.dispatcher.RuntimePermissions;
-
-/* Copyright 2016 Patrick Löwenstein
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. */
 
 // UWAGA UWAGA w gradle musi byc wszedzie to samo:         applicationId "com.patloew.georeferencingsample"
 // dla tel i zegarka, inaczej nie będzie komunikacji!
@@ -191,19 +172,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     private TextView tvKmToCm = null;
 
-    private RadioButton radioButtonPositionSource_gps = null;
-    private RadioButton radioButtonPositionSource_distance = null;
-    private RadioButton radioButtonPositionType_osnowa = null;
-    private RadioButton radioButtonPositionType_lampion = null;
 
     //private RxWear rxWear;
     private CompositeSubscription subscription = new CompositeSubscription();
-    //private Observable<Boolean> validator;
 
     SortableGeoLocationTableView geoTableView = null;
 
-    private EditText offsetX;
-    private EditText offsetY;
 
     static private int FILE_CODE_WRITE = 147;
     static private int FILE_CODE_READ = 148;
@@ -217,8 +191,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private Button buttonComputeDistances;
     private Button buttonSave, buttonLoad;
 
-    private RadioButton radioGroupReferenceToZeroPoint;
-    private EditText editTextReferenceToPointNr;
 
     private EditText mackotext;
     private GeoLocationDataAdapter geoAdapter = null;
@@ -405,8 +377,11 @@ public class MainActivity extends AppCompatActivity implements MainView,
     }
 
     private void updateAfterChangeNrOfPoints(){
-        calculateAndShowDistances();
+        //redrawTable();
+        if(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size() >= 2)
+            calculateAndShowDistances();
         redrawTable();
+        DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
         fillSpinnersWithPoints();
 
     }
@@ -462,13 +437,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
         List<String> categories = new ArrayList<String>();
 
         String selectedPos11 = "";
-        if(binding.spinner11.isSelected())
+        if(binding.spinner11.getCount() > 0)
             selectedPos11 = binding.spinner11.getSelectedItem().toString();
         String selectedPos21 = "";
-        if(binding.spinner21.isSelected())
+        if(binding.spinner21.getCount() > 0)
             selectedPos21 = binding.spinner21.getSelectedItem().toString();
         String selectedPos22 = "";
-        if(binding.spinner22.isSelected())
+        if(binding.spinner22.getCount() > 0)
             selectedPos22 = binding.spinner22.getSelectedItem().toString();
 
         for(GeoLocation o :
@@ -530,25 +505,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
 
 
-    /*
-    protected void setUpMapIfNeeded() {
-
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mapFragment == null) {
-            mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView));
-            // Check if we were successful in obtaining the map.
-            if (mapFragment != null) {
-                mapFragment.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap map) {
-                        loadMap(map);
-                    }
-                });
-            }
-        }
-    }
-    */
-
     private class MyOnScrollListener implements OnScrollListener {
         @Override
         public void onScroll(final ListView tableDataView, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
@@ -590,46 +546,11 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_mobile);
 
-        //binding.textViewKmToCm.setText("mru");
-        //binding.textViewCmToKm.setText("mru");
-                //rxWear = new RxWear(this);
 
 
         //Wearable.getMessageClient(this).addListener(this);
 
         verifyStoragePermissions(this);
-/*
-        mapView = findViewById(R.id.mapView);
-        if( mapView != null) {
-            mapView.onCreate(null);
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    //map = googleMap;
-
-                    googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-    //                googleMap.getUiSettings().setZoomGesturesEnabled(true);
-                    googleMap.getUiSettings().setCompassEnabled(true);
-                    googleMap.getUiSettings().setScrollGesturesEnabled(true);
-//                    googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-                    googleMap.getUiSettings().setZoomGesturesEnabled(true);
-                    googleMap.getUiSettings().setZoomControlsEnabled(true);
-                    googleMap.getUiSettings().setMapToolbarEnabled(true);
-                    //googleMap.setMinZoomPreference(6.0f);
-                    //googleMap.setMaxZoomPreference(14.0f);
-
-                    LatLng l = new LatLng(-21.1, 52.2);
-                    //googleMap.moveCamera(CameraUpdateFactory.newLatLng(52.1, -21.9));
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(l));
-
-
-                    //Do what you want with the map!!
-                }
-            });
-
-            MapsInitializer.initialize(this);
-        }
-*/
 
         customMapView = findViewById(R.id.mapView);
         if (customMapView != null) {
@@ -714,8 +635,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonAddPoint = findViewById(R.id.button2);
         buttonRemove = findViewById(R.id.buttonRemovePoint);
 
-        radioGroupReferenceToZeroPoint = findViewById(R.id.radioButtonPointZero);
-        editTextReferenceToPointNr = findViewById(R.id.editTextReferencePoint);
+
+
 
 
         buttonSave = findViewById(R.id.buttonSave);
@@ -731,14 +652,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
         mackotext = findViewById(R.id.editTextName);
 
-        radioButtonPositionSource_gps = findViewById(R.id.radioButtonPositionSource_GPS);
-        radioButtonPositionSource_distance = findViewById(R.id.radioButtonPositionSource_measure);
 
-        radioButtonPositionType_lampion = findViewById(R.id.radioButton_lampion);
-        radioButtonPositionType_osnowa = findViewById(R.id.radioButton_osnowa);
 
-        offsetX = findViewById(R.id.offsetX);
-        offsetY = findViewById(R.id.offsetY);
+
 
         radioGroupOsnowaLampion = findViewById(R.id.RadioGrupaOsnowaLampion);
 
@@ -796,29 +712,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         }
 
-        final SortableCarTableView carTableView = (SortableCarTableView) findViewById(R.id.tableView);
-        if (carTableView != null) {
-            final CarTableDataAdapter carTableDataAdapter = new CarTableDataAdapter(this, DataFactory.createCarList(), carTableView);
-            carTableView.setDataAdapter(carTableDataAdapter);
-            carTableView.addDataClickListener(new CarClickListener());
-            carTableView.addDataLongClickListener(new CarLongClickListener());
-            carTableView.setSwipeToRefreshEnabled(true);
-            carTableView.setSwipeToRefreshListener(new SwipeToRefreshListener() {
-                @Override
-                public void onRefresh(final RefreshIndicator refreshIndicator) {
-                    carTableView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Car randomCar = getRandomCar();
-                            carTableDataAdapter.getData().add(randomCar);
-                            carTableDataAdapter.notifyDataSetChanged();
-                            refreshIndicator.hide();
-                            Toast.makeText(MainActivity.this, "Added: " + randomCar, Toast.LENGTH_SHORT).show();
-                        }
-                    }, 3000);
-                }
-            });
-        }
 
 
         binding.radioButtonLampion.setOnClickListener(
@@ -886,95 +779,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 }
         );
 
-        radioGroupOsnowaLampion.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (radioButtonPositionType_osnowa.isChecked()) {
-                    radioButtonPositionSource_distance.setText("Marker");
-                    binding.RadioGrupaLampiony.setVisibility(View.INVISIBLE);
-                }else {
-                    radioButtonPositionSource_distance.setText("distance");
-                }
-            }
-        });
-
-        radioGroupReferenceToZeroPoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                editTextReferenceToPointNr.setText("");
-            }
-        });
-
-
-
-        /*
-        radioGroupReferenceToZeroPoint.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-            @Override
-            public void onFocusChange(View v, boolean hasFocus){
-                if(hasFocus)
-                    editTextReferenceToPointNr.setText("");
-            }
-        });
-*/
-
-        editTextReferenceToPointNr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                radioGroupReferenceToZeroPoint.setChecked(false);
-            }
-        });
-
-
-/*
-        editTextReferenceToPointNr.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-               // radioGroupReferenceToZeroPoint.setChecked(false);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //radioGroupReferenceToZeroPoint.setChecked(false);
-                //if (s.charAt(s.length() - 1) == '\n') {
-//                    Log.d("TEST RESPONSE", "Enter was pressed");
-//                }
-            }
-        });
-*/
-
-/*
-        editTextReferenceToPointNr.setOnFocusChangeListener(new View.OnFocusChangeListener(){
-            @Override
-            public void onFocusChange(View v, boolean hasFocus){
-                if(hasFocus){
-                    // i dodane android:imeOptions="actionSend" w EditText
-                    radioGroupReferenceToZeroPoint.setChecked(false);
-                }
-            }
-        });
-*/
-
-        //radioButtonPositionType_osnowa.setOnClickListener(new View);
-        radioButtonPositionType_osnowa.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    radioButtonPositionSource_distance.setText("Marker");
-                    binding.RadioGrupaLampiony.setVisibility(View.INVISIBLE);
-                }else
-                    radioButtonPositionSource_distance.setText("distance");
-            }
-        });
-
 
         centerMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -990,6 +794,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
 
             }
         });
@@ -1012,26 +817,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                 startActivity(FILE_CODE_WRITE, FilePickerActivity.class);
 
-/*
-                Intent i = new Intent(getApplicationContext(), FilePickerActivity.class);
-                // This works if you defined the intent filter
-                // Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-
-                // Set these depending on your use case. These are the defaults.
-
-                i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-                i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_NEW_FILE);
-
-                // Configure initial directory by specifying a String.
-                // You could specify a String like "/storage/emulated/0/", but that can
-                // dangerous. Always use Android's API calls to get paths to the SD-card or
-                // internal memory.
-                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-
-                startActivityForResult(i, FILE_CODE );
-*/
-
             }
 
 
@@ -1045,13 +830,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-//                String s2 = DATE_FORMAT.format(new Date());
-
-
-        //        Toast.makeText(getApplicationContext(), "sent message?", Toast.LENGTH_LONG).show();
-                //startActivity(FILE_CODE_READ, FilePickerActivity.class);
 
 
                 Intent i = new Intent(getBaseContext(), FilePickerActivity.class);
@@ -1070,12 +848,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 //i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH,getFilesDir().getAbsolutePath() + "/manewry");
 
-
                 startActivityForResult(i, FILE_CODE_READ);
-
-
-                //deserializeFromFile();
-                //pickFile();
 
             }
         });
@@ -1131,8 +904,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
         Double offX22 = 0.0;
 
         try {
-            offX = Double.parseDouble(binding.offsetX.getText().toString());
-            offY = Double.parseDouble(binding.offsetY.getText().toString());
+            offX = Double.parseDouble(binding.offsetXG1.getText().toString());
+            offY = Double.parseDouble(binding.offsetYG1.getText().toString());
         } catch(Exception e) {
             singleXYset = false;
 
@@ -1144,18 +917,21 @@ public class MainActivity extends AppCompatActivity implements MainView,
             twoOdl = false;
         }
 
-        int ref22 = 0;
-        int ref21 = 0;
-        int ref1 = 0;
-        if(binding.spinner11.isSelected()){
+        int ref22 = -1;
+        int ref21 = -1;
+        int ref1 = -1;
+        //if(binding.spinner11.isSelected()){
+        if(binding.spinner11.getCount()> 0){
             String s= binding.spinner11.getSelectedItem().toString();
             ref1 = (int)binding.spinner11.getSelectedItemId();
         }
-        if(binding.spinner21.isSelected()){
+        //if(binding.spinner21.isSelected()){
+        if(binding.spinner21.getCount()> 0){
 
             ref21 = (int)binding.spinner21.getSelectedItemId();
         }
-        if(binding.spinner22.isSelected()){
+        //if(binding.spinner22.isSelected()){
+        if(binding.spinner22.getCount()> 0){
 
             ref22 = (int)binding.spinner22.getSelectedItemId();
         }
@@ -1164,71 +940,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         if(binding.radioButtonOsnowa.isChecked()){
 
-            if(binding.radioButtonOsnowaXy.isChecked()){
-
-            } else if(binding.radioButtonLampionOdl.isChecked()){
-
-            } else if(binding.radioButtonOsnowaMarker.isChecked()){
-
-            }
-
-        } else if(binding.radioButtonLampion.isChecked()){
-            if(binding.radioButtonLampionOdl.isChecked() && twoOdl){
-
-                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
-                GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(ref21, offX21, ref22, offX22, 1.0/odl);
-
-            } else if(binding.radioButtonLampionXy.isChecked()){
-
-            }// else if(binding.)
-        }
-
-        updateAfterChangeNrOfPoints();
-
-    }
-
-    private void addPointOldApproach(){
-        Log.d("SSR", "blebe");
-        Location l = new Location("");
-
-        //
-
-        Double offX = Double.parseDouble(offsetX.getText().toString());
-        Double offY = Double.parseDouble(offsetY.getText().toString());
-
-        int refPointNr = 0;
-        if (!radioGroupReferenceToZeroPoint.isChecked()) {
-            String s = editTextReferenceToPointNr.getText().toString();
-            try {
-                refPointNr = Integer.parseInt(s);
-            } catch (Exception e) {
-                refPointNr = 0;
-            }
-        }
-
-        if (radioButtonPositionType_osnowa.isChecked()) {
-
             if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
                 Toast.makeText(getBaseContext(), "both offs can be 0.0 for osnowa!", Toast.LENGTH_LONG).show();
                 return;
             }
 
-
-            if (radioButtonPositionSource_gps.isChecked()) {
-
-                // gps
-
-                //rxLocation.
-
-                //if(msLastLocation.)
-                l.setLatitude(msLastLocation.getLatitude());
-                l.setLongitude(msLastLocation.getLongitude());
-
-                //l.setLa
-                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromGPS(l, refPointNr, offX, offY);
-
-
-            } else if (radioButtonPositionSource_distance.isChecked()) {
+            if(binding.radioButtonOsnowaXy.isChecked()){
 
                 if (currentMarker == null) {
                     Toast.makeText(getBaseContext(), "no marker!", Toast.LENGTH_LONG).show();
@@ -1238,65 +955,39 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 // marker
                 l.setLatitude(currentMarker.getPosition().latitude);
                 l.setLongitude(currentMarker.getPosition().longitude);
-                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(l, refPointNr, offX, offY);
+                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(l, ref1, offX, offY);
+
+            } else if(binding.radioButtonLampionOdl.isChecked()){
+
+            } else if(binding.radioButtonOsnowaMarker.isChecked()){
+
+
+
+//                binding.radioButtonOsnowaMarker.setEnabled(false);
 
             }
 
-        } else if (radioButtonPositionType_lampion.isChecked()) {
-            // lampion
+        } else if(binding.radioButtonLampion.isChecked()){
+            if(binding.radioButtonLampionOdl.isChecked() && twoOdl && ref21 != -1 && ref22 != -1){
+                boolean leftUpper = binding.checkBoxLeftUpper.isChecked();
 
 
-            if (radioButtonPositionSource_gps.isChecked()) {
+                Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+                GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(ref21, offX21, ref22, offX22, 1.0/odl, leftUpper);
+                //GeoLocation.Repozytorium.addNewOsnowaPointWithValidPosFromMarker(0, 5.05, 1, 5.95, 1.0/odl);
 
+            } else if(binding.radioButtonLampionXy.isChecked()){
 
-            } else if (radioButtonPositionSource_distance.isChecked()) {
+                //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint(refPointNr, offX, offY);
 
-                if ((offX == 0.0 && offY == 0.0) && !com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.isRepositoryEmpty()) {
-                    Toast.makeText(getBaseContext(), "both offs can be 0.0 for lampion!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLampionPoint(refPointNr, offX, offY);
-            }
+            }// else if(binding.)
         }
 
-                /*
-                if(radioButtonPositionSource_gps.isChecked()) {
-                    if(currentMarker != null) {
-                        l.setLongitude(currentMarker.getPosition().longitude);
-                        l.setLatitude(currentMarker.getPosition().latitude);
-                        com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, currentMarker.getPosition().latitude, currentMarker.getPosition().longitude);
-                    }} else {
+        updateAfterChangeNrOfPoints();
 
-
-
-                } //else if(rad)
-*/
-
-        calculateAndShowDistances();
-
-        //tvKmToCm.setText("Ho" + odl);
-
-
-        //@BindView(R.id.textViewCmToKm) TextView button1;
-
-        // geoTableView. - redraw?
-        geoAdapter.notifyDataSetInvalidated();
-        geoAdapter.notifyDataSetChanged();
-
-
-        //geoTableView.refreshDrawableState();
-
-        GeoLocation.Repozytorium.writePositionsToFile();
-        String s = GeoLocation.Repozytorium.readFromFile();
-        mackotext.setText("dd" + s);
-
-        int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
-        MyService.sendToWearPointsNumberData(numOfPoints);
-
-
-        DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
     }
+
+
 
     protected void calculateAndShowDistances(){
         Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
@@ -1365,7 +1056,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     @Override
     protected void onResume() {
-        //mapView.onResume();
+
         customMapView.onResume();
         super.onResume();
 
@@ -1445,14 +1136,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         if (!f.exists())
                             f.createNewFile();
 
-                        /*
-                        OutputStreamWriter outputStreamWriter =
-                                new OutputStreamWriter(new FileOutputStream(f));
-                        outputStreamWriter.write(data2);
-                        outputStreamWriter.close();
-                        */
                         serializeToFile(f);
-                        //InputStream in =  getContentResolver().openInputStream(uri);
 
 
                     } catch (Exception e) {
@@ -1460,28 +1144,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
                         e.printStackTrace();
                     }
                 }
-                //Toast.makeText(this, "plik=" + uri.toString(), Toast.LENGTH_LONG);
-                //File file = Utils.getFileForUri(uri);
-                // Do something with the result...
             }
             return;
         }
         switch (requestCode) {
 
-            /*
-            case FilePickerConst.REQUEST_CODE_DOC:
-                if(resultCode== Activity.RESULT_OK && data!=null)
-                {
-//                    docPaths = new ArrayList<>();
-//                    docPaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS));
-                }
-                break;
-                */
         }
-
-
-        //
-        //        addThemToView(photoPaths,docPaths);
     }
 
 

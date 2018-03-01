@@ -114,7 +114,7 @@ data class GeoLocation (var location: Location?,
             return mm;
         }
 
-        fun addNewOsnowaPointWithValidPosFromMarker(relativeToNr1: Int, len1: Double, relativeToNr2: Int, len2: Double, odl: Double) : Unit{
+        fun addNewOsnowaPointWithValidPosFromMarker(relativeToNr1: Int, len1: Double, relativeToNr2: Int, len2: Double, odl: Double, leftUpper: Boolean = false) : Unit{
 
             val l1: GeoLocation? = Repozytorium.locationPositions[relativeToNr1];
             val l2: GeoLocation? = Repozytorium.locationPositions[relativeToNr2];
@@ -131,7 +131,11 @@ data class GeoLocation (var location: Location?,
             println("angle=" + angle);
 
 
-            val l: LatLng = SphericalUtil.computeOffset(LatLng(l1!!.location!!.latitude, l1!!.location!!.longitude), len1*1000.0/(odl*1000.0), dir+angle);
+            var angleResult = dir + angle;
+            if(leftUpper)
+                angleResult = dir - angle;
+            val l: LatLng = SphericalUtil.computeOffset(LatLng(l1!!.location!!.latitude, l1!!.location!!.longitude), len1*1000.0/(odl*1000.0), angleResult);
+            println("computed location = " + l.toString());
             //val l: Location = l1.location.
 
             var lok = Location("")

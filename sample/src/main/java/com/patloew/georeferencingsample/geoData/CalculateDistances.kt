@@ -72,6 +72,10 @@ public fun computeLampionDistances(l: List<GeoLocation>, odl : Double)  {
 
         if(ll.typ == PointType.LAMPION_OFF || ll.typ == PointType.LAMPION_MARKER) {
 
+            // to niedobrze, nie chcemy przeliczac pkt juz obliczonych przy dodawaniu 2x odl. Zmienic! Liczyc to przy dodawaniu pkt
+            if(ll.offsetX == 0.0 && ll.offsetY == 0.0)
+                continue;
+
             val baseNr = ll.refLocationNum;
             val base: GeoLocation? = mapa[baseNr]
 
@@ -94,6 +98,8 @@ public fun calibrateDistances(l: List<GeoLocation>) : Double {
 
         //computeLampionPosition(ll)
 
+
+
         if(ll.typ == PointType.OSNOWA_MARKER || ll.typ == PointType.OSNOWA_GPS) {
 
             if(ll.refLocationNum == ll.num){
@@ -102,6 +108,8 @@ public fun calibrateDistances(l: List<GeoLocation>) : Double {
             }
 
             val baseNr = ll.refLocationNum;
+            if(baseNr == -1)
+                continue;
             val base: GeoLocation? = mapa[baseNr]
 
             val r = computeDistance(ll, base)

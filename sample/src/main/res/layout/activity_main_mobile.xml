@@ -33,7 +33,15 @@
                 android:scrollIndicators="top|bottom|right|end"
                 custom:tableView_columnCount="4"
                 custom:tableView_headerColor="@color/primary"
-                custom:tableView_headerElevation="10" />
+                custom:tableView_headerElevation="10" >
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="CheckBox" />
+            </com.patloew.georeferencingsample.SortableGeoLocationTableView>
 
 
             <TextView
@@ -142,20 +150,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radioButtonPositionSource_GPS"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="GPS" />
-
-                    <RadioButton
-                        android:id="@+id/radioButtonPositionSource_measure"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Dystans" />
 
                 </RadioGroup>
             </LinearLayout>
@@ -298,20 +292,20 @@
 
                 <Spinner
                     android:id="@+id/spinner2_1"
-                    android:layout_width="91dp"
+                    android:layout_width="52dp"
                     android:layout_height="34dp"
                     android:layout_weight="1"
                     android:background="?attr/colorPrimary" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="9dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="x [cm]=" />
+                    android:text="x[cm]" />
 
                 <EditText
                     android:id="@+id/wartosc_G2_1"
-                    android:layout_width="80dp"
+                    android:layout_width="51dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
@@ -327,20 +321,27 @@
                     android:background="?attr/colorPrimary" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="6dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="y [cm]=" />
+                    android:text="y[cm]" />
 
                 <EditText
                     android:id="@+id/wartosc_G2_2"
-                    android:layout_width="80dp"
+                    android:layout_width="68dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
                     android:numeric="integer|signed|decimal"
                     android:text="" />
+
+                <CheckBox
+                    android:id="@+id/checkBoxLeftUpper"
+                    android:layout_width="26dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="L/U" />
             </LinearLayout>
 
 
@@ -350,69 +351,13 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Ref:" />
-
-                <RadioButton
-                    android:id="@+id/radioButtonPointZero"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="pkt 0" />
-
-                <EditText
-                    android:id="@+id/editTextReferencePoint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:imeOptions="actionSend"
-                    android:text="Name" />
-            </LinearLayout>
+        </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="x [cm]=" />
-
-                <EditText
-                    android:id="@+id/offsetX"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
-                    android:numeric="integer|signed|decimal"
-                    android:text="" />
-
-                <TextView
-                    android:layout_width="21dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="y [cm]=" />
-
-                <EditText
-                    android:id="@+id/offsetY"
-                    android:layout_width="89dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="textPersonName|number|numberSigned|numberDecimal|numberPassword"
-                    android:numeric="signed|decimal"
-                    android:text="" />
 
             </LinearLayout>
 
@@ -532,14 +477,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="367dp" />
 
-            <com.patloew.georeferencingsample.SortableCarTableView
-                android:id="@+id/tableView"
-                android:layout_width="match_parent"
-                android:layout_height="138dp"
-                android:layout_below="@id/toolbar"
-                custom:tableView_columnCount="4"
-                custom:tableView_headerColor="@color/primary"
-                custom:tableView_headerElevation="10" />
         </LinearLayout>
     </ScrollView>
 
