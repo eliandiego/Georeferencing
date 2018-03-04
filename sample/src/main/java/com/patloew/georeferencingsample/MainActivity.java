@@ -108,12 +108,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-//import butterknife.ButterKnife;
-//import butterknife.OnClick;
-
 import static com.patloew.georeferencingsample.mapsHelpers.SizeHelperKt.getBoundingRect;
-
-
 
 // UWAGA UWAGA w gradle musi byc wszedzie to samo:         applicationId "com.patloew.georeferencingsample"
 // dla tel i zegarka, inaczej nie będzie komunikacji!
@@ -173,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private TextView tvKmToCm = null;
 
 
-    //private RxWear rxWear;
     private CompositeSubscription subscription = new CompositeSubscription();
 
     SortableGeoLocationTableView geoTableView = null;
@@ -189,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private Button buttonRemove;
     private Button buttonDrawMarkers;
     private Button buttonComputeDistances;
-    private Button buttonSave, buttonLoad;
+
 
 
     private EditText mackotext;
@@ -213,20 +207,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    private Car getRandomCar() {
-        final List<Car> carList = DataFactory.createCarList();
-        final int randomCarIndex = Math.abs(new Random().nextInt() % carList.size());
-        return carList.get(randomCarIndex);
-    }
-
-    private class CarClickListener implements TableDataClickListener<Car> {
-
-        @Override
-        public void onDataClicked(final int rowIndex, final Car clickedData) {
-            final String carString = "Click1: " + clickedData.getProducer().getName() + " " + clickedData.getName();
-            Toast.makeText(MainActivity.this, carString, Toast.LENGTH_SHORT).show();
-        }
-    }
 
     void setNavigationToPoint(GeoLocation target) {
 
@@ -294,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     }
 
     private void serializeToFile() {
-        //Map<Integer, GeoLocation> m = GeoLocation.Repozytorium.getLocationPositions();
         String json = new Gson().toJson(GeoLocation.Repozytorium.getLocationPositions());
 
         Context context = this.getApplicationContext();
@@ -329,52 +308,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    private String getStringFromFile(File f) {
-        Context context = this.getApplicationContext();
 
-        StringBuilder textB = new StringBuilder();
-
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                textB.append(line);
-                textB.append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-
-        String text = textB.toString();
-        return text;
-    }
-
-    private String getStringFromFile(String fileName) {
-        Context context = this.getApplicationContext();
-        File path = context.getFilesDir();
-        File file = new File(path, fileName);
-        StringBuilder textB = new StringBuilder();
-
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                textB.append(line);
-                textB.append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-
-        String text = textB.toString();
-        return text;
-    }
 
     private void updateAfterChangeNrOfPoints(){
         //redrawTable();
@@ -406,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private void deserializeFromFile(File f) {
 
 
-        //String text = getStringFromFile(f);
+
         try {
             FileInputStream fis = new FileInputStream(f);
 
@@ -478,32 +412,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
-    private void deserializeFromFile() {
-        //MutableMap<Int, GeoLocation> = mutableMapOf()
-        //String json = new Gson().toJson(GeoLocation.Repozytorium.getLocationPositions());
-        String text = getStringFromFile("oko.txt");
-        String textP = getStringFromFile("oko2.txt");
-
-        try {
-            Gson gson = new Gson();
-            //Map<Integer, GeoLocation>
-            //gson.fromJson(text.toString(), object:MutableMap<Int, GeoLocation>);
-            //gson.fromJson(text.toString(), Map<Integer, GeoLocation>);
-            GeoLocation.Repozytorium.getMutableMapFromJsonLocationPositions(gson, text.toString());
-            GeoLocation.Repozytorium.getMutableMapFromJsonPositionsUser(gson, textP.toString());
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "can write to file", Toast.LENGTH_SHORT).show();
-        }
-        Toast.makeText(MainActivity.this, "data updated, size of table=" + GeoLocation.Repozytorium.getPositionsUser().size(), Toast.LENGTH_LONG).show();
-
-        updateAfterChangeNrOfPoints();
-        //geoAdapter.notifyDataSetInvalidated();
-        //geoAdapter.notifyDataSetChanged();
-
-    }
-
-
-
 
     private class MyOnScrollListener implements OnScrollListener {
         @Override
@@ -517,9 +425,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
         }
     }
 
-    private void configureCameraIdle() {
-        //GoogleMap.OnCameraIdleListener
-    }
 
 
     private void pickFile() {
@@ -539,14 +444,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
         setContentView(R.layout.activity_main_mobile);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_mobile);
-
-
 
         //Wearable.getMessageClient(this).addListener(this);
 
@@ -559,7 +459,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    //map = googleMap;
 
                     googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                     //                googleMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -580,7 +479,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     googleMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
 
                     mapaGooglowa = googleMap;
-
 
                     googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                         @Override
@@ -605,11 +503,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                                         .draggable(false).visible(true));
                             }
                         }
-
                     });
-
-
-                    //Do what you want with the map!!
                 }
             });
 
@@ -635,38 +529,13 @@ public class MainActivity extends AppCompatActivity implements MainView,
         buttonAddPoint = findViewById(R.id.button2);
         buttonRemove = findViewById(R.id.buttonRemovePoint);
 
-
-
-
-
-        buttonSave = findViewById(R.id.buttonSave);
-        buttonLoad = findViewById(R.id.buttonLoad);
-
-
         tvKmToCm = findViewById(R.id.textViewKmToCm);
-
-
-
 
         buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
         buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
         mackotext = findViewById(R.id.editTextName);
 
-
-
-
-
         radioGroupOsnowaLampion = findViewById(R.id.RadioGrupaOsnowaLampion);
-
-        //Location l = new Location("dd");
-        //l.setLatitude(2.2);
-        //l.setLongitude(2.1);
-        //GeoLocation g1 = new GeoLocation(l, 3.3, 5.5, true, 0);
-        //GeoLocation g2 = new GeoLocation(l, 2.4, 4.4, true, 0);
-
-        //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addStartPoint(l);
-        //com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.addNewLocationPoint(l, -2.2, +3.3);
-
 
         binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
         binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
@@ -681,7 +550,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 else {
                     getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-                    //getWindow().addFlags(WindowManager.LayoutParams.FLAG_SC);
                 }
 
 
@@ -809,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         });
 
-        buttonSave.setOnClickListener(new View.OnClickListener() {
+        binding.buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -818,16 +686,9 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 startActivity(FILE_CODE_WRITE, FilePickerActivity.class);
 
             }
-
-
-
-
         });
 
-
-
-
-        buttonLoad.setOnClickListener(new View.OnClickListener() {
+        binding.buttonLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -868,7 +729,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                                                 int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
                                                 MyService.sendToWearPointsNumberData(numOfPoints);
-
                                             }
                                         }
         );
@@ -878,6 +738,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
             public void onClick(View v) {
                 //addPointOldApproach();
                 addPointNewApproach();
+                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+                MyService.sendToWearPointsNumberData(numOfPoints);
             }
 
 
@@ -892,8 +754,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     private void addPointNewApproach(){
 
         Location l = new Location("");
-
-        //
 
         boolean singleXYset = true;
         boolean twoOdl = true;
@@ -961,8 +821,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
             } else if(binding.radioButtonOsnowaMarker.isChecked()){
 
-
-
 //                binding.radioButtonOsnowaMarker.setEnabled(false);
 
             }
@@ -1019,10 +877,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 //FilePickerActivity.EXTRA_START_PATH
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
 
-
-        //mode =
-
-
         i.putExtra(FilePickerActivity.EXTRA_MODE, AbstractFilePickerFragment.MODE_FILE);
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
@@ -1041,7 +895,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
         startActivityForResult(i, code);
     }
-
 
     @Override
     protected void onStart() {
@@ -1066,22 +919,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     }
 
-    public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-
-        //This method was deprecated in API level 11
-        //Cursor cursor = managedQuery(contentUri, proj, null, null, null);
-
-        CursorLoader cursorLoader = new CursorLoader(
-                this,
-                contentUri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-
-        int column_index =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1102,10 +939,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 File f = null;
                 try {
                     verifyStoragePermissions(this);
-                    //FileOutputStream fos = openFileOutput(getRealPathFromURI(uri), MODE_PRIVATE);
-                    //fos.write(data2.getBytes());
-                    //fos.close();
-
 
                     String path = uri.getPath();
                     // content://com.patloew.rxlocationsample.provider/root/data/data/com.patloew.rxlocationsample/files/manewry/ee.txt
@@ -1120,13 +953,17 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 if (FILE_CODE_READ == requestCode) {
                     deserializeFromFile(f);
 
-                    calculateAndShowDistances();
+                    //calculateAndShowDistances();
+                    updateAfterChangeNrOfPoints();
 
                     Pair<Location,Location> m = getBoundingRect(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions());
 
                     moveMapTo(m);
 
-                    DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+                    //DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
+                    int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+                    MyService.sendToWearPointsNumberData(numOfPoints);
+
 
                 } else if (FILE_CODE_WRITE == requestCode) {
 
