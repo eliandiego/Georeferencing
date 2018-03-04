@@ -727,8 +727,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                                                 geoAdapter.notifyDataSetInvalidated();
                                                 geoAdapter.notifyDataSetChanged();
 
-                                                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
-                                                MyService.sendToWearPointsNumberData(numOfPoints);
+                                                MyService.sendToWearNumberOfPoints();
                                             }
                                         }
         );
@@ -738,8 +737,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
             public void onClick(View v) {
                 //addPointOldApproach();
                 addPointNewApproach();
-                int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
-                MyService.sendToWearPointsNumberData(numOfPoints);
+                MyService.sendToWearNumberOfPoints();
+
             }
 
 
@@ -961,8 +960,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
                     moveMapTo(m);
 
                     //DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
-                    int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
-                    MyService.sendToWearPointsNumberData(numOfPoints);
+                    MyService.sendToWearNumberOfPoints();
 
 
                 } else if (FILE_CODE_WRITE == requestCode) {

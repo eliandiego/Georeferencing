@@ -54,6 +54,12 @@ import rx.subscriptions.CompositeSubscription;
 public class MyService extends Service {
 
 
+    public static void sendToWearNumberOfPoints() {
+        int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
+        MyService.sendToWearPointsNumberData(numOfPoints);
+
+    }
+
     public interface WearChannelModes {
 
         String MESSAGE = "/message";
@@ -137,7 +143,6 @@ public class MyService extends Service {
 
         rxWear = new RxWear(getApplicationContext());
 
-
         subscription.add(rxWear.message().listen("/messageFromWear", MessageApi.FILTER_LITERAL)
                 .compose(MessageEventGetDataMap.noFilter())
                 .subscribe(dataMap -> {
@@ -148,9 +153,6 @@ public class MyService extends Service {
 
         rxLocation = new RxLocation(getApplicationContext());
         rxLocation.setDefaultTimeout(15, TimeUnit.SECONDS);
-
-
-
 
         startTimer();
         startRxLocationRefresh();
@@ -186,11 +188,14 @@ public class MyService extends Service {
                                 Log.e(TAG, "asked about selected point: " + i );
                                 Location l = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().get(i).getLocation();
                                 sendToWearLocationData("/points", "selected", l);
+
+                            } else if(dataMap.containsKey("giveNumOfPoints")){
+
+                                //sendToMobileIntegerData("/points", "giveNumOfPoints", 0);
+                                sendToWearNumberOfPoints();
                             }
                         },
                         throwable -> Log.d(TAG, "Error on data listen for giveSelectedPoint"));
-
-
     }
 
     @Override
@@ -252,7 +257,7 @@ public class MyService extends Service {
        String s2 = "sec=" + calendar.get(Calendar.SECOND);
         Log.e("MyService", "poz rxLocation=" + s + "/" + s2);
 
-       sendToWearMessage(s, "swm_rxLoc" + s2);
+       //sendToWearMessage(s, "swm_rxLoc" + s2);
        sendToWearLocation(location);
     }
 
@@ -543,11 +548,8 @@ public class MyService extends Service {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
 
-
             String s2 = "mee" + location.getLatitude();
-            sendToWearData(s2);
-
-
+            //sendToWearData(s2);
         }
 
         @Override

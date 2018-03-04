@@ -244,6 +244,8 @@ public class MainActivity extends WearableActivity {
                     Log.d(TAG, "got /location as message");
                 }, throwable -> Log.d(TAG, "Error on message listen for /location")));
 
+        askMobileAboutNumberOfPoints();
+
     }
 
     private void updateDisplayedDataUpd() {
@@ -356,6 +358,10 @@ public class MainActivity extends WearableActivity {
         */
     }
 
+    void askMobileAboutNumberOfPoints(){
+        sendToMobileIntegerData("/points", "giveNumOfPoints", 0);
+    }
+
     void sendGiveLocationForSelectedPointToWear(){
         sendToMobileIntegerData("/points", "giveSelectedPoint", currentPointNr);
     }
@@ -405,7 +411,6 @@ public class MainActivity extends WearableActivity {
     @OnClick(R.id.buttonMS)
     public void submit(View view) {
         Log.i(TAG, "klikneli mnie!");
-        //sendToMobile("baba", "zaba");
 
         if(currentPointNr < numOfPoints-1)
             currentPointNr++;
@@ -420,9 +425,7 @@ public class MainActivity extends WearableActivity {
     public void measureDistance(View view) {
         Log.i(TAG, "klikneli mnie!");
 
-        //pinLocation = lastValidLocation;
         pinLocation = new Location(lastValidLocation);
-
     }
 
 }
