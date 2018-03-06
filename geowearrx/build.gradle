@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
@@ -13,6 +14,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        dataBinding.enabled = true
     }
     buildTypes {
         release {
@@ -49,4 +51,10 @@ dependencies {
 
     annotationProcessor 'com.jakewharton:butterknife:8.8.1'
     compile 'com.jakewharton:butterknife:8.8.1'
+    //compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+}
+repositories {
+    mavenCentral()
 }

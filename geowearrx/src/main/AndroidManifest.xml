@@ -29,7 +29,7 @@
         </meta-data-->
 
         <activity
-            android:name="com.patloew.georeferencingsample.MainActivity"
+            android:name="com.patloew.georeferencingsample.MainWearActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -59,6 +59,7 @@ import com.nononsenseapps.filepicker.AbstractFilePickerFragment;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.nononsenseapps.filepicker.Utils;
 
+
 import com.patloew.georeferencingsample.databinding.ActivityMainMobileBinding;
 import com.patloew.georeferencingsample.event.SimpleEvent;
 import com.patloew.georeferencingsample.geoData.PointType;

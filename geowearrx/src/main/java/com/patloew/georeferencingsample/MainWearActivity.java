@@ -1,10 +1,16 @@
 package com.patloew.georeferencingsample;
 
 import static butterknife.ButterKnife.findById;
+import static com.patloew.georeferencingsample.utils.UtilsKt.convertTo360deg;
+import static com.patloew.georeferencingsample.utils.UtilsKt.testFormat;
 
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -15,23 +21,14 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.patloew.georeferencingsample.R;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.MessageApi;
 import com.patloew.rxwear.GoogleAPIConnectionException;
 import com.patloew.rxwear.RxWear;
 import com.patloew.rxwear.transformers.DataEventGetDataMap;
-import com.patloew.rxwear.transformers.DataItemGetDataMap;
 import com.patloew.rxwear.transformers.MessageEventGetDataMap;
-
-import org.greenrobot.eventbus.EventBus;
-
-import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,25 +36,29 @@ import butterknife.OnClick;
 //import butterknife.Bind;
 
 import io.reactivex.disposables.CompositeDisposable;
-import rx.Observable;
-import rx.subscriptions.CompositeSubscription;
 
-public class MainActivity extends WearableActivity {
+import android.databinding.DataBindingUtil;
+//import com.patloew.georeferencingsample.databinding.ActivityMainMobileBinding;
+
+//import com.patloew.georeferencingsample.databinding.ActivityWearMainBinding;
+import com.patloew.georeferencingsample.databinding.ActivityWearMainBinding;
+public class MainWearActivity extends WearableActivity {
+
+    ActivityWearMainBinding binding;
 
     private static final String TAG = "WearMainActivity";
 
 
+
     private BoxInsetLayout mContainerView;
-    private TextView mTitleText;
-    private TextView mMessageText;
-    private TextView mPersistentText;
-    private TextView mText2;
-    private TextView mTextSetDistance;
+
+
+
 
     private int currentPointNr = 0;
     private int numOfPoints = 0;
 
-    @BindView(R.id.textViewBattery) TextView battery;
+    //@BindView(R.id.textViewBattery) TextView battery;
 
 
     // 1.3
@@ -67,34 +68,39 @@ public class MainActivity extends WearableActivity {
     private RxWear rxWear;
 
     private Location lastValidLocation = null;
+    private Location previousValidLocation = null;
     private Boolean isLastValid = false;
     private Time lastValidLocationRcvDate = new Time();
+    private Time previousMyCourseRcvDate = new Time();
+
     private Location pinLocation = null;
     private Location targetLocation = new Location("");
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        setContentView(R.layout.activity_wear_main);
 
         lastValidLocation = new Location("");
 
-        //ButterKnife.bind(this, this.get);
-        //ButterKnife.bind(MainActivity.this);
+        previousMyCourseRcvDate.setToNow();
 
-        setContentView(R.layout.activity_main);
+        //ButterKnife.bind(this, this.get);
+        //ButterKnife.bind(MainWearActivity.this);
+
+
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_wear_main);
 
         setAmbientEnabled();
         // musi byc po setContentView!
         ButterKnife.bind(this);
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
-        mTitleText = (TextView) findViewById(R.id.title);
-        mMessageText = (TextView) findViewById(R.id.message);
-        mPersistentText = (TextView) findViewById(R.id.persistent);
-        mText2 = findViewById(R.id.textView2);
-        mTextSetDistance = findViewById(R.id.textViewDistance);
+
 
 
         rxWear = new RxWear(this);
@@ -111,6 +117,11 @@ public class MainActivity extends WearableActivity {
                 // Do something here on the main thread
                 updateDisplayedData();
                 Log.d("Handlers", "Called on main thread");
+
+Time t = new Time();
+t.setToNow();;
+                binding.textViewClock.setText(testFormat(2, 0, t.hour) + ":" + testFormat(2, 0, t.minute) + ":" + testFormat(2, 0, t.second));
+
                 handler.postDelayed(this, 1000);
             }
         };
@@ -167,7 +178,7 @@ public class MainActivity extends WearableActivity {
                     if(dataMap.containsKey("pointsNum")) {
                         int i = dataMap.getInt("pointsNum");
                         numOfPoints = i;
-                        mPersistentText.setText("sel=" + currentPointNr + "/num=" + i);
+                        binding.textViewPoints.setText("sel=" + currentPointNr + "/num=" + i);
                         Log.e(TAG, "got points num");
                     }
                     if(dataMap.containsKey("selectedlatitude")) {
@@ -217,6 +228,8 @@ public class MainActivity extends WearableActivity {
 
                     Boolean n = false;
 
+
+
                     Double lat = dataMap.getDouble("latitude");
                     if( lat != 0.0) {
                         lastValidLocation.setLatitude(lat);
@@ -235,17 +248,67 @@ public class MainActivity extends WearableActivity {
                         n=true;
                     }
 
-                    if(!n)
+                    if(!n) {
                         isLastValid = false;
-                    else
+                        previousValidLocation = null;
+                    }else {
                         isLastValid = true;
+                    }
 
                     updateDisplayedDataUpd();
                     Log.d(TAG, "got /location as message");
                 }, throwable -> Log.d(TAG, "Error on message listen for /location")));
 
         askMobileAboutNumberOfPoints();
+        addBorder(binding.textViewBattery);
 
+
+        binding.buttonMS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "klikneli mnie!");
+
+                if(currentPointNr < numOfPoints-1)
+                    currentPointNr++;
+                else
+                    currentPointNr= 0;
+
+                //mPersistentText.setText("sel=" + currentPointNr + "/0-" + (numOfPoints-1));
+                binding.textViewPoints.setText("sel=" + currentPointNr + "/0-" + (numOfPoints-1));
+                sendGiveLocationForSelectedPointToWear();
+
+
+            }
+        });
+
+        binding.buttonSetDist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "klikneli mnie!");
+
+                pinLocation = new Location(lastValidLocation);
+            }
+        });
+
+    }
+
+    private void addBorder(TextView tv){
+        ShapeDrawable sd = new ShapeDrawable();
+
+        // Specify the shape of ShapeDrawable
+        sd.setShape(new RectShape());
+
+        // Specify the border color of shape
+        sd.getPaint().setColor(Color.RED);
+
+        // Set the border width
+        sd.getPaint().setStrokeWidth(10f);
+
+        // Specify the style is a Stroke
+        sd.getPaint().setStyle(Paint.Style.STROKE);
+
+        // Finally, add the drawable background to TextView
+        tv.setBackground(sd);
     }
 
     private void updateDisplayedDataUpd() {
@@ -253,9 +316,34 @@ public class MainActivity extends WearableActivity {
         //updateDisplayedData();
     }
 
+    private void updateMyCourse(){
+
+        String text = "--";
+
+        if(previousValidLocation != null && lastValidLocation != null){
+
+            float dir = previousValidLocation.bearingTo(lastValidLocation);
+            String dirStr = testFormat(3, 2, convertTo360deg(dir));
+
+            text = "Dir=" + dirStr;//replaceTrailingZerosWithSpaces(dirStr);
+        }
+
+
+        binding.walkDi.setText(text);
+    }
+
+
+
+    private String replaceTrailingZerosWithSpaces(String s){
+        return s.replaceAll("\\G0", " ");
+    }
+
     private void updateDisplayedData(){
 
-        battery.setText("b:" + getBatteryLevel() + "b");
+
+        updateMyCourse();
+
+        binding.textViewBattery.setText("b:" + getBatteryLevel() + "b");
 
 
 
@@ -263,6 +351,14 @@ public class MainActivity extends WearableActivity {
             Time t = new Time();
             t.setToNow();
             long d = (t.toMillis(false) - lastValidLocationRcvDate.toMillis(false)) / 1000;
+
+            long d2 = (t.toMillis(false) - previousMyCourseRcvDate.toMillis(false)) / 1000;
+
+            if(d2 > 5){
+                previousMyCourseRcvDate.setToNow();
+                updateMyCourse();
+                previousValidLocation= new Location(lastValidLocation);
+            }
 
             boolean[] e = {false};
             String mru ="";
@@ -277,24 +373,46 @@ public class MainActivity extends WearableActivity {
                 mru = "E";
             }
 
+            String lastTime = "" + d + "[s]" ;
+            if(d > 1000.0)
+                lastTime = "inf";
+
             String isLastValidStr = "";
             if(!isLastValid)
                 isLastValidStr = "H";
-                    //.doOnComplete(()->{e[0]="e";});
-            mTitleText.setText(mru + isLastValidStr + d + "[s]" + lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
+            //.doOnComplete(()->{e[0]="e";});
+            binding.textViewTimeFromComm.setText(mru + lastTime );
+
+//            binding.accuracy.setText("acc=" + lastValidLocation.getAccuracy());
+
+
+            Double acc = (double) lastValidLocation.getAccuracy();
+
+            binding.accuracyTV.setText("acc=" + acc.intValue() + " ");
+            binding.currentLat.setText("lat=" + lastValidLocation.getLatitude());
+            binding.currentLon.setText(" lon=" + lastValidLocation.getLongitude());
+            //mTitleText.setText(   lastValidLocation.getAccuracy() + ":" + lastValidLocation.getLatitude() + "@@" + lastValidLocation.getLongitude());
+
         }
 
         String text = "";
         if(pinLocation != null) {
             float dist = lastValidLocation.distanceTo(pinLocation);
             float dir = lastValidLocation.bearingTo(pinLocation);
-            mTextSetDistance.setText("pin:"+ " dist=" + dist + " dir=" + dir + pinLocation.getLatitude() );
+
+            String dirStr = testFormat(3, 2, convertTo360deg(dir));
+            binding.textViewPinDir.setText("dir=" + dirStr);
+            binding.textViewPinDist.setText("dist=" + dist);
+            //mTextSetDistance.setText("pin:"+ " dist=" + dist + " dir=" + dir + pinLocation.getLatitude() );
         }
 
         if(targetLocation != null) {
             float dist = lastValidLocation.distanceTo(targetLocation);
             float dir = lastValidLocation.bearingTo(targetLocation);
-            mMessageText.setText("target:"+ " dist=" + dist + " dir=" + dir + targetLocation.getLatitude() );
+            //mMessageText.setText("target:"+ " dist=" + dist + " dir=" + dir + targetLocation.getLatitude() );
+            String dirStr = testFormat(3, 2, convertTo360deg(dir));
+            binding.textViewTargetDir.setText("dir=" + dirStr);
+            binding.textViewTargetDist.setText("dist=" + dist);
         }
 
 
@@ -373,7 +491,7 @@ public class MainActivity extends WearableActivity {
                 },
                 // ,
                 throwable -> {
-                    Log.e("MainActivity", "Error on sending (Data) data", throwable);
+                    Log.e("MainWearActivity", "Error on sending (Data) data", throwable);
 
                     if (throwable instanceof GoogleAPIConnectionException) {
                         //              Toast.makeText(getApplicationContext(), "Android Wear app is not installed", Toast.LENGTH_LONG).show();
@@ -408,24 +526,16 @@ public class MainActivity extends WearableActivity {
 
     }
 
+    /* // butterknife
     @OnClick(R.id.buttonMS)
     public void submit(View view) {
-        Log.i(TAG, "klikneli mnie!");
 
-        if(currentPointNr < numOfPoints-1)
-            currentPointNr++;
-        else
-            currentPointNr= 0;
-
-        mPersistentText.setText("sel=" + currentPointNr + "/0-" + (numOfPoints-1));
-        sendGiveLocationForSelectedPointToWear();
     }
-
+*/ /*
     @OnClick(R.id.buttonSetDist)
     public void measureDistance(View view) {
-        Log.i(TAG, "klikneli mnie!");
 
-        pinLocation = new Location(lastValidLocation);
     }
+    */
 
 }

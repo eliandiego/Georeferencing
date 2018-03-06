@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    -->
+<android.support.wearable.view.BoxInsetLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.patloew.georeferencingsample.MainWearActivity"
+    tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_box="all">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <!--style="@style/TextAppearance.Wearable.Small"
+            style="@style/TextAppearance.Wearable.Medium"
+            -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="points"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:id="@+id/textViewBattery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:text="b123b"
+                    android:textAlignment="textStart" />
+
+                <TextView
+                    android:id="@+id/textViewBattery3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_weight="1"
+                    android:text="b123b"
+                    android:textAlignment="textStart" />
+
+                <TextView
+                    android:id="@+id/textViewTimeFromComm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_weight="1"
+                    android:text="timeFromC"
+                    android:textAlignment="textStart" />
+
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/accuracyTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="acc"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/walkDi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="walkDir"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/textViewClock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="clock"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/currentLat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text='"lat"'
+                android:textAlignment="center" />
+
+                <TextView
+                    android:id="@+id/currentLon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text='"long"'
+                    android:textAlignment="center" />
+
+        </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/holo_green_dark"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/buttonMS"
+                    android:layout_width="68dp"
+                    android:layout_height="match_parent"
+                    android:text="ChgPoint" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewTargetDir"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="targetHdg" />
+
+                    <TextView
+                        android:id="@+id/textViewTargetDist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="targetDist" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!--android:layout_marginTop="4dp" android:textAlignment="center" -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/holo_orange_dark"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonSetDist"
+                    android:layout_width="98dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Pin" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewPinDir"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="pinHdg" />
+
+                    <TextView
+                        android:id="@+id/textViewPinDist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="pinDist" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+</android.support.wearable.view.BoxInsetLayout>
+</layout>
