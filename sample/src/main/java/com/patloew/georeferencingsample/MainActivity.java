@@ -533,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         tvKmToCm = findViewById(R.id.textViewKmToCm);
 
         buttonDrawMarkers = findViewById(R.id.buttonShowPointsOnMap);
-        buttonComputeDistances = findViewById(R.id.buttonCalculateDistances);
+
         mackotext = findViewById(R.id.editTextName);
 
         radioGroupOsnowaLampion = findViewById(R.id.RadioGrupaOsnowaLampion);
@@ -660,13 +660,16 @@ public class MainActivity extends AppCompatActivity implements MainView,
         });
 
 
-        buttonComputeDistances.setOnClickListener(new View.OnClickListener() {
+        /*
+        binding.buttonQuit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+getActivity().finish();
+System.exit(0);
 
             }
         });
+        */
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

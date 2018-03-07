@@ -198,6 +198,13 @@ t.setToNow();;
                                 Log.e(TAG, "selected acc=" + f);
 
                     }
+                            if(dataMap.containsKey("battMob")) {
+                                int i= dataMap.getInt("battMob");
+                                binding.textBatteryMobile.setText(" " + i);
+                                Log.e(TAG, "selected acc=" + i);
+
+                            }
+
                     },
                         throwable -> Log.d(TAG, "Error on data listen for persistenttext"));
 

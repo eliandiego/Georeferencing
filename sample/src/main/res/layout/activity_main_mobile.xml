@@ -419,17 +419,23 @@
                 android:layout_height="wrap_content"
                 android:text="Center Map on GPS" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
             <Button
-                android:id="@+id/buttonCalculateDistances"
-                android:layout_width="match_parent"
+                android:id="@+id/buttonQuit"
+                android:layout_width="248dp"
                 android:layout_height="wrap_content"
-                android:text="Calculate Distances" />
+                android:text="Quit" />
 
             <Button
                 android:id="@+id/buttonShowPointsOnMap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Show Points on Map" />
+        </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

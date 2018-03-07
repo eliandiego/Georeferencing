@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.BatteryManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -53,6 +54,8 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class MyService extends Service {
 
+    private boolean batterySign = false;
+
 
     public static void sendToWearNumberOfPoints() {
         int numOfPoints = com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size();
@@ -74,6 +77,8 @@ public class MyService extends Service {
     private static final String TAG = "BOOMBOOMTESTGPS";
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+
+
 
     private final CompositeDisposable disposable = new CompositeDisposable();
     private RxLocation rxLocation;
@@ -196,6 +201,21 @@ public class MyService extends Service {
                             }
                         },
                         throwable -> Log.d(TAG, "Error on data listen for giveSelectedPoint"));
+
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+
+
+                sendToWearBatteryLevel();
+
+                handler.postDelayed(this, 2000);
+            }
+        }, 2000);
+
     }
 
     @Override
@@ -269,6 +289,22 @@ public class MyService extends Service {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onAddressUpdate, throwable -> Log.e("MainPresenter", "Error fetching location/address updates", throwable))
         );
+    }
+
+    public int getBatteryLevel() {
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+// Error checking that probably isn't needed but I added just in case.
+        if(level == -1 || scale == -1) {
+            return -1;
+        }
+
+
+        Double batteryLevelWithDecimals = (double) ((float)level / (float)scale) * 100.0f;
+        Integer i = batteryLevelWithDecimals.intValue();
+        return  i;
     }
 
     public Maybe<Address> fromLocationMS(Location location) {
@@ -377,6 +413,18 @@ public class MyService extends Service {
     static public void sendToWearPointsNumberData(int value){
         sendToWearIntegerData("/points", "pointsNum", value);
     }
+
+    public void sendToWearBatteryLevel(){
+        int value = getBatteryLevel();
+
+        batterySign = !batterySign;
+        if(!batterySign){
+            value = -value;
+        }
+
+        sendToWearIntegerData("/points", "battMob", value);
+    }
+
 
     static public void sendToWearIntegerData(String path, String topic, int value){
         Log.e("MyService", "sendToWearIntegerData:" + value );
