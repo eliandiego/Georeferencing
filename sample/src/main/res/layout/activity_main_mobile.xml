@@ -154,95 +154,21 @@
                 </RadioGroup>
             </LinearLayout>
 
-            <RadioGroup
-                android:id="@+id/RadioGrupa_osnowa"
-                android:layout_width="558dp"
-                android:layout_height="match_parent"
+
+
+
+            <Spinner
+                android:id="@+id/spinnerOsnowaType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal">
-
-
-                <RadioButton
-                    android:id="@+id/radioButton_osnowa_odl"
-                    android:layout_width="6dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="O: odl+Mar" />
-
-
-                <RadioButton
-                    android:id="@+id/radioButton_osnowa_xy"
-                    android:layout_width="6dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="O: x,y+Mar" />
-
-                <RadioButton
-                    android:id="@+id/radioButton_osnowa_marker"
-                    android:layout_width="1dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="O: mar" />
-
-                <RadioButton
-                    android:id="@+id/radioButton_osnowa_gps"
-                    android:layout_width="3dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="O: gps" />
-
-            </RadioGroup>
-
-            <RadioGroup
-                android:id="@+id/RadioGrupa_lampiony"
-                android:layout_width="558dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-
-                <RadioButton
-                    android:id="@+id/radioButton_lampion_odl"
-                    android:layout_width="9dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="L: 2x odl+Mark" />
-
-
-                <RadioButton
-                    android:id="@+id/radioButton_lampion_xy"
-                    android:layout_width="15dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:width="2dp"
-                    android:maxWidth="3dp"
-                    android:text="L: x,y+mark"
-                    android:textSize="10sp" />
-
-                <RadioButton
-                    android:id="@+id/radioButton_lampion_marker"
-                    android:layout_width="6dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="L: mark" />
-
-                <RadioButton
-                    android:id="@+id/radioButton_lampion_gps"
-                    android:layout_width="11dp"
-                    android:layout_height="22dp"
-                    android:layout_weight="1"
-                    android:text="L: gps" />
-
-
-
-            </RadioGroup>
-
+                android:entries="@array/wartosci_osnowa" />
             <Spinner
                 android:id="@+id/spinnerLampionType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:entries="@array/wartosci" />
+                android:entries="@array/wartosci_lampion" />
 
             <LinearLayout
                 android:id="@+id/Grupa_1_wartosc"
@@ -478,10 +404,18 @@
 
                 <Button
                     android:id="@+id/buttonRemovePoint"
-                    android:layout_width="165dp"
+                    android:layout_width="85dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Remove current" />
+
+                <Button
+                    android:id="@+id/buttonRemoveAllPoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Remove all" />
+
             </LinearLayout>
 
             <TextView
