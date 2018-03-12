@@ -157,6 +157,7 @@ public class MyService extends Service {
 
 
         rxLocation = new RxLocation(getApplicationContext());
+        // nie moze byc za czesto (1) bo nie nadoza z aktualizacjami na wear
         rxLocation.setDefaultTimeout(15, TimeUnit.SECONDS);
 
         startTimer();
@@ -210,7 +211,7 @@ public class MyService extends Service {
                 //Do something after 100ms
 
 
-                sendToWearBatteryLevel();
+                //sendToWearBatteryLevel();
 
                 handler.postDelayed(this, 2000);
             }
@@ -593,10 +594,11 @@ public class MyService extends Service {
         @Override
         public void onLocationChanged(Location location)
         {
-            Log.e(TAG, "onLocationChanged: " + location);
+            Log.e(TAG, "onLocationChangedmee: " + location);
             mLastLocation.set(location);
 
             String s2 = "mee" + location.getLatitude();
+            sendToWearBatteryLevel();
             //sendToWearData(s2);
         }
 

@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -558,6 +559,16 @@ public class MainActivity extends AppCompatActivity implements MainView,
         });
 
 
+        binding.spinnerLampionType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getApplicationContext(), "Miau" + i, Toast.LENGTH_LONG).show();
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                return;
+            }
+        });
+
         //final SortableGeoLocationTableView geoTableView = findViewById(R.id.tableViewGeo);
         geoTableView = findViewById(R.id.tableViewGeo);
         if (geoTableView != null) {
@@ -659,17 +670,15 @@ public class MainActivity extends AppCompatActivity implements MainView,
             }
         });
 
-
-        /*
-        binding.buttonQuit.setOnClickListener(new View.OnClickListener() {
+binding.buttonExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-getActivity().finish();
+finish();
 System.exit(0);
 
             }
         });
-        */
+
         buttonDrawMarkers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -808,6 +817,8 @@ System.exit(0);
                 return;
             }
 
+
+
             if(binding.radioButtonOsnowaXy.isChecked()){
 
                 if (currentMarker == null) {
@@ -829,6 +840,14 @@ System.exit(0);
             }
 
         } else if(binding.radioButtonLampion.isChecked()){
+
+//
+            if(binding.spinnerLampionType.getSelectedItemId() == 1){
+                Toast.makeText(this, "Brr", Toast.LENGTH_LONG).show();
+            }
+
+            Toast.makeText(this, "Brr" + binding.spinnerLampionType.getSelectedItemId(), Toast.LENGTH_LONG).show();
+
             if(binding.radioButtonLampionOdl.isChecked() && twoOdl && ref21 != -1 && ref22 != -1){
                 boolean leftUpper = binding.checkBoxLeftUpper.isChecked();
 

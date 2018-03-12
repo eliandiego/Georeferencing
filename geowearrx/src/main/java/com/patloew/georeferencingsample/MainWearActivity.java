@@ -232,10 +232,7 @@ t.setToNow();;
                 .compose(MessageEventGetDataMap.noFilter())
                 .subscribe(dataMap -> {
 
-
                     Boolean n = false;
-
-
 
                     Double lat = dataMap.getDouble("latitude");
                     if( lat != 0.0) {
@@ -413,7 +410,10 @@ t.setToNow();;
             //mTextSetDistance.setText("pin:"+ " dist=" + dist + " dir=" + dir + pinLocation.getLatitude() );
         }
 
+        Log.e("MainWearActivityMuu", "refresh");
+
         if(targetLocation != null) {
+            Log.e("MainWearActivityMuu", "targetLat=" + targetLocation.getLatitude() + " lastValidLoc=" + lastValidLocation.getLatitude());
             float dist = lastValidLocation.distanceTo(targetLocation);
             float dir = lastValidLocation.bearingTo(targetLocation);
             //mMessageText.setText("target:"+ " dist=" + dist + " dir=" + dir + targetLocation.getLatitude() );

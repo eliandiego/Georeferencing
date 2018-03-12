@@ -233,8 +233,16 @@
                     android:layout_weight="1"
                     android:text="L: gps" />
 
+
+
             </RadioGroup>
 
+            <Spinner
+                android:id="@+id/spinnerLampionType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:entries="@array/wartosci" />
 
             <LinearLayout
                 android:id="@+id/Grupa_1_wartosc"
@@ -413,6 +421,12 @@
                 android:layout_height="wrap_content"
                 android:text="Keep screen @string/library_acra_libraryVersion" />
 
+            <CheckBox
+                android:id="@+id/checkBoxRxUseLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use RxLocation" />
+
             <Button
                 android:id="@+id/buttonCenterMap"
                 android:layout_width="match_parent"
@@ -425,7 +439,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/buttonQuit"
+                android:id="@+id/buttonExit"
                 android:layout_width="248dp"
                 android:layout_height="wrap_content"
                 android:text="Quit" />
