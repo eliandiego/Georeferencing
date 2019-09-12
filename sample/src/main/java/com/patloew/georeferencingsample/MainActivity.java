@@ -4,6 +4,7 @@ package com.patloew.georeferencingsample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -314,8 +316,8 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
     private void updateAfterChangeNrOfPoints(){
         //redrawTable();
-        if(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size() >= 2)
-            calculateAndShowDistances();
+        //if(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getLocationPositions().size() >= 2)
+          //  calculateAndShowDistances(); // to sie popsulo przy pkt xy lampionach
         redrawTable();
         DrawMarkers(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.getPositionsUser());
         fillSpinnersWithPoints();
@@ -575,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
 
                     binding.Grupa1Wartosc.setVisibility(View.VISIBLE);
                     binding.Grupa2Wartosci.setVisibility(View.INVISIBLE);
-                    //binding.offsetYG1.setVisibility(View.VISIBLE);
+                    binding.offsetYG1.setVisibility(View.VISIBLE);
 
                 } else if(i == 3){ // marker
 
@@ -602,6 +604,46 @@ public class MainActivity extends AppCompatActivity implements MainView,
                 return;
             }
         });
+
+
+
+        binding.buttonSetScale.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // compute distances for scales given in windows
+
+                        double m1 = Double.parseDouble(binding.textViewDistanceMap1main.getText().toString());
+                        double m2 = Double.parseDouble(binding.textViewDistanceMap2main.getText().toString());
+                        double m3 = Double.parseDouble(binding.textViewDistanceMap3main.getText().toString());
+
+                        double t1 = Double.parseDouble(binding.textViewDistanceTerrain1main.getText().toString());
+                        double t2 = Double.parseDouble(binding.textViewDistanceTerrain2main.getText().toString());
+                        double t3 = Double.parseDouble(binding.textViewDistanceTerrain3main.getText().toString());
+
+                        double odl1_1cm = 0.0;
+                        double odl2_1cm = 0.0;
+                        double odl3_1cm = 0.0;
+                        if(m1 != 0.0 && t1 != 0.0)
+                            odl1_1cm = t1 / m1;
+                        if(m2 != 0.0 && t2 != 0.0)
+                            odl2_1cm = t2 / m2;
+                        if(m3 != 0.0 && t3 != 0.0)
+                            odl3_1cm = t3 / m3;
+
+                        double res = odl1_1cm;
+                        if(odl2_1cm != 0.0)
+                            res = (res+odl2_1cm) / 2.0;
+                        if(odl3_1cm != 0.0)
+                            res = (res+odl3_1cm) / 2.0;
+
+                        res = 1 / (res/1000.0);
+                        calculateDistancesForKnownScale(res);
+
+                    }
+                }
+        );
 
         binding.spinnerOsnowaType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -813,6 +855,18 @@ System.exit(0);
 
     }
 
+    private void showScaleDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("podaj skale mapy");
+        LayoutInflater inflater = this.getLayoutInflater();
+
+        View viewInflated = inflater.inflate(R.layout.set_map_scale, null);
+
+        TextView distMap1 = viewInflated.findViewById(R.id.textViewDistanceMap1);
+
+
+    }
+
     private void resetLampionOsnowaSelectors(){
         binding.spinnerOsnowaType.setSelection(2);
         binding.spinnerLampionType.setVisibility(View.INVISIBLE);
@@ -957,6 +1011,16 @@ System.exit(0);
                     break;
                 }
                 case 2: {
+                    GeoLocation.Repozytorium.addNewLampionPoint(ref21, offX, offY);
+
+                    Double odl = Double.parseDouble(binding.textViewKmToCm.getText().toString());
+                    calculateDistancesForKnownScale(odl);
+                    break;
+                }
+                case 4: {
+                    l.setLatitude(msLastLocation.getLatitude());
+                    l.setLongitude(msLastLocation.getLongitude());
+                    GeoLocation.Repozytorium.addNewLampionPoint(l, "gps");
                     break;
                 }
             }
@@ -972,10 +1036,7 @@ System.exit(0);
 
     }
 
-
-
-    protected void calculateAndShowDistances(){
-        Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+    protected void calculateDistancesForKnownScale(double odl){
         Log.d("SSR", "odleglosci");
         CalculateDistancesKt.computeLampionDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions(), odl);
         Log.d("SSR", "lampiony obliczone");
@@ -983,6 +1044,12 @@ System.exit(0);
 
         binding.textViewCmToKm.setText("" + odl);
         binding.textViewKmToCm.setText("" + 1000.0 / odl);
+    }
+
+    protected void calculateAndShowDistances(){
+        Double odl = CalculateDistancesKt.calibrateDistances(com.patloew.georeferencingsample.geoData.GeoLocation.Repozytorium.giveAllStoredLocationPositions());
+
+        calculateDistancesForKnownScale(odl);
 
     }
 
@@ -1173,10 +1240,16 @@ System.exit(0);
         }
 
         Location target = navigationTarget.getLocation();
-        float dist = loc.distanceTo(target);
+        double dist = loc.distanceTo(target);
         float dir = loc.bearingTo(target);
 
-        navigateTo_TextView.setText("nav to pkt:" + navigationTarget.getNum() + " dist=" + dist + " dir=" + dir);
+        String unit = " [m]";
+        if(dist > 1000){
+            dist = dist/1000.0;
+            unit = " [km]";
+        }
+
+        navigateTo_TextView.setText("nav to pkt:" + navigationTarget.getNum() + " dist=" + dist + unit + " dir=" + dir);
 
 
     }

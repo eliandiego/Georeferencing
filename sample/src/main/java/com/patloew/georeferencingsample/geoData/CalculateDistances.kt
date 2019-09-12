@@ -87,6 +87,8 @@ public fun computeLampionDistances(l: List<GeoLocation>, odl : Double)  {
 
 }
 
+//public fun calculateDistancesFromMeasurements(m1: Double, t1: Double, m2: Double, t2: Double, m3: Double, t3: Double) : Double {
+//}
 
 public fun calibrateDistances(l: List<GeoLocation>) : Double {
 

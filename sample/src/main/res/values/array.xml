@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+        <string-array name="wartosci">
+            <item>A</item>
+            <item>Almak</item>
+            <item>Anlamak</item>
+            <item>Anlasmak</item>
+            <item>Anlatmak</item>
+            <item>Ayrilmak</item>
+        </string-array>
+
+    <string-array name="wartosci_lampion">
+        <item>2x odleglosc</item>
+        <item>azymut</item>
+        <item>odl xy</item>
+        <item>marker</item>
+        <item>gps current</item>
+        <item>lat, lon</item>
+    </string-array>
+
+    <string-array name="wartosci_osnowa">
+        <item>marker + xy</item>
+        <item>marker + odl</item>
+        <item>marker first</item>
+    </string-array>
+
+    <string-array name="one">
+        <item>"Item 1"</item>
+    </string-array>
+
+    <string-array name="two">
+        <item>"Item 2"</item>
+    </string-array>
+
+    <string-array name="my_list">
+        <item>@array/one</item>
+        <item>@array/two</item>
+    </string-array>
+
+</resources>
